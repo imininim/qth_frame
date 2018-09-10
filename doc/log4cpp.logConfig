@@ -1,0 +1,43 @@
+﻿#********************************************************
+#					日志配置文件模板
+#功能 		： 	使用 通用基础库中日志模块需要此配置文件
+#使用方式 	： 	如果使用了基础库， 请拷贝此文件至程序运行目录下
+#
+#日志级别说明	: 	FATAL  = 0,		ALERT  = 100,
+#				CRIT   = 200,	ERROR  = 300,
+#				WARN   = 400,	NOTICE = 500,
+#				INFO   = 600,	DEBUG  = 700,	
+#数值越小， 日志级别越大， 当设置了数值大的日志级别， 则在程序输出时自动忽略比设置的级别小的输出条目
+#(例如： 设置的日志级别为 INFO, 那么在你的程序中 只有数值 <= INFO 的日志会被输出.)
+#**********************************************************
+
+
+#在这里可以设置 日志的级别
+log4cpp.rootCategory = DEBUG, rootAppender
+
+#不用管
+log4cpp.appender.rootAppender = RollingFileAppender
+
+#这里设置输出的日志路径
+log4cpp.appender.rootAppender.fileName = ./testLog.log
+
+#这里设置单个日志文件的大小 （KB）
+log4cpp.appender.rootAppender.maxFileSize = 1048576
+
+#最多保留多少个日志文件（第一个日志文件写满后，会写到第二个日志文件中， 这里指出最多有多少个后备日志文件）
+log4cpp.appender.rootAppender.maxBackupIndex = 5
+
+#不用管
+log4cpp.appender.rootAppender.layout = PatternLayout
+
+#日志文件输出格式 : %d 日期， %p 该条日志的级别, %m 消息， %n换行符
+log4cpp.appender.rootAppender.layout.ConversionPattern =%d[%p] %m%n
+
+#*************************************************************************************************************
+
+#以下这些 不用管
+#log4cpp.category.debugCategory=DEBUG, debugAppender
+#additivity.debugCategory=false
+#log4cpp.appender.debugAppender = ConsoleAppender
+#log4cpp.appender.debugAppender.layout = PatternLayout
+#log4cpp.appender.debugAppender.layout.ConversionPattern = %d [%p] - %m%n

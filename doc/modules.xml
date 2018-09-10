@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+		本文件用于模块化的自动创建， 为其提供的模板配置
+		每一个 <Module /> 代表一个模块
+		
+		className 	源代码中类的名称
+		
+		moduleID 	设置该模块的模块ID
+		moduleName  设置该模块的模块名称
+-->
+<root>
+
+	<Module className="A" moduleID="1" moduleName="Module A"/>
+	<Module className="B" moduleID="2" moduleName="Module B"/>
+</root>

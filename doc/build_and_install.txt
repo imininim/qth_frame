@@ -1,0 +1,42 @@
+﻿一、 编译须知
+1.  本项目依赖于boost库， 在编译本项目之前需要先行编译boost, 但是不需要安装boost.
+	因此如果用户自身不需要使用boost,则无需安装他
+
+2. 	本项目通过 CMake  提供跨平台的编译， 因此编译本项目之前请确保安装了 CMake
+	
+	
+	
+二、  linux 下编译和安装
+
+
+0. 编译和安装前的准备工作
+	a. 确保你已经安装了 cmake 2.8 以上版本
+	b.root账户下  检测文件 /etc/ld.so.conf 中 是否有  /usr/local/lib 这一行，如果没有则加上。
+
+1.  编译
+	执行更目录下的脚本 ./build_project.sh 完成编译工作，默认生成 debug版本, ./build_project.sh Release 生成release版本
+
+2. 安装 
+	cd build/Debug  		或者对应的Release版本目录下
+	make install 			安装该库文件
+	/sbin/ldconfig -v   	动态库查找更新
+	
+3.  安装完成
+	g++ xxx.cpp -lqthserver					//在你的编译选项中加入 -lqthserver 以链接安装好的动态库	
+
+	
+三、 windows 下编译和安装	
+0.  编译和安装前的准备工作
+		a. 确保你安装了 vs系列 或 vc 系列的编译器
+
+1.	进入到 3rd 编译boost
+		a.使用解压工具，解压 boost_1_60_0.tar.gz 这个压缩包到当前目录 【备注，选择解压到当前目录， 不要解压到boost_1_60_0目录】
+		b.进入到解压的 boost_1_60_0 目录， 双击执行 bootstrap.bat 文件, 会生成 b2.exe 文件
+		c.双击执行 b2.exe  等待编译完成
+		
+2.	编译本项目, 退回到根目录下， 进入 build 目录， 如果你想编译 Debug 版本， 则进入 build/Debug, 否则进入 build/Release
+		a. 执行 debug.bat 生成debug版本的项目
+		b. 执行 release.bat 生成release版本的项目
+		c. 脚本执行后，会在你执行脚本的目录下 生成你在windows对应编译器的工程， 打开该工程， 进行编译   【注意： 如果你执行的是release.bat,  打开工程后，一定要把工程选项切换到 Release 模式， 否则无法针对代码进行编译器优化】
+		d. 编译完成后， 会在根目录/bin 中生成对应的  qthserver.lib 和 qthserver.dll 文件，  所有的头文件都在 include 目录下，  你应该将这些东西copy到你的工程目录下
+		
