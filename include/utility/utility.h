@@ -59,7 +59,7 @@ BEGIN_NAMESPACE
 	template<class T>
 	std::string T_to_string( const T& in_t )
 	{
-		std::stringstream stream_T_to_str;
+		static std::stringstream stream_T_to_str;
 		stream_T_to_str.clear();
 		stream_T_to_str << in_t;
 		return stream_T_to_str.str();
