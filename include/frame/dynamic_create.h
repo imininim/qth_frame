@@ -1,28 +1,32 @@
-/********************************
-author:		qutianhao
-function:	¶¯Ì¬´´½¨»úÖÆ
-date:		2018/07/25
-tips:
-	Ìá¹©ÒÔÀàÃû³Æ´´½¨ÀàµÄ»úÖÆ
-	ÀàËÆÓÚÈçÏÂ»úÖÆ, ×Ö·û´®¿ÉÀ´×ÔÓÚÍøÂç£¬ÓÃ»§ÊäÈë£¬»òÕß±¾µØÎÄ¼ş
-		A* p = Create("A"); 
-*********************************/
+ï»¿/**************************************
+author:			qutianhao
+function:		åŠ¨æ€åˆ›å»ºæœºåˆ¶
+date:			2018/07/25
+tips:	
+	æä¾›ä»¥ç±»åç§°åˆ›å»ºç±»çš„æœºåˆ¶
+	ç±»ä¼¼äºå¦‚ä¸‹:
+	A* pA = new "A"      å…¶ä¸­ "A" æ˜¯ä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œå¯ä»¥æ¥è‡ªä¸ç½‘ç»œã€ç”¨æˆ·è¾“å…¥æˆ–è€…ä¸€ä¸ªæœ¬åœ°æ–‡ä»¶
+***************************************/
 #ifndef DYNAMIC_CREATE_H_
 #define DYNAMIC_CREATE_H_
 BEGIN_NAMESPACE
 
-	//¶¯Ì¬´´½¨ÀàĞÅÏ¢£¬ÄÚ½¨list
+	
 	template<class T>
 	class RunTimeClassEx
 	{
 	public:
-		char* m_pClassName;				//ÀàĞÍÃû³Æ
-		RunTimeClassEx* m_pNext;		//Ö¸ÏòÏÂÒ»¸ö½Úµã
-		static RunTimeClassEx* s_pFirst;//Ö¸ÏòÊ×½Úµã
-		T* (*m_pCreateFn)();			//Ö¸Ïò´´½¨³öÕâ¸öÀàĞÍµÄÖ¸Õë
+		char* m_pClassName;					//ç±»åç§°	
+		RunTimeClassEx* m_pNext;			//æŒ‡å‘ä¸‹ä¸€ä¸ªç±»èŠ‚ç‚¹
+		
+		T* (*m_pCreateFn)();				//æŒ‡å‘åˆ›å»ºå‡ºè¿™ä¸ªç±»å¯¹è±¡çš„å‡½æ•°
 		T* CreateObject();	
+
+		static RunTimeClassEx* s_pFirst;	//æŒ‡å‘é¦–ç±»èŠ‚ç‚¹
+		static T* CreateObject(const char* strObj);
 	};
-	//¾²Ì¬³ÉÔ±³õÊ¼»¯
+		
+	
 	template<class T> RunTimeClassEx<T>* RunTimeClassEx<T>::s_pFirst = NULL;
 	
 	template<class T>
@@ -31,8 +35,22 @@ BEGIN_NAMESPACE
 		if (!m_pCreateFn) return NULL;
 		return (*m_pCreateFn)();
 	}
-		
-	//ÀàĞÍĞÅÏ¢µÄÁ¬½Ó¹¤×÷
+	
+	template<class T>
+	T* RunTimeClassEx<T>::CreateObject(const char* strObj)
+	{
+		typedef RunTimeClassEx<T>  ClassInfo;
+		for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
+		{
+			if (strObj && it->m_pClassName && strcmp(strObj, it->m_pClassName) == 0)
+				return it->CreateObject();
+		}
+
+		return NULL;
+	}
+
+
+	
 	template<class RTC>
 	struct initRunTimeClassEx
 	{
@@ -46,12 +64,13 @@ BEGIN_NAMESPACE
 	};
 END_NAMESPACE
 
-/**************
-¶¯Ì¬´´½¨ÉùÃ÷
-	params:
-		className		µ±Ç°ÀàµÄÃû³Æ
-		baseClassName	¼Ì³ĞµÄ³éÏóÀàÃû³Æ
-****************/
+
+/*******************************
+åŠ¨æ€åˆ›å»ºå£°æ˜
+params:
+	className		å½“å‰ç±»çš„åç§°
+	baseClassName	ç»§æ‰¿çš„æŠ½è±¡ç±»åç§°
+********************************/
 #define DECLARE_DYNAMIC_CREATE(className, baseClassName) \
 	public:\
 	static QTH_NAME_SPACE::RunTimeClassEx<baseClassName> class##className;\

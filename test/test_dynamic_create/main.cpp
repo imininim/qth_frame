@@ -30,6 +30,13 @@ int main(int argc, char* argv[])
 		}
 			
 	}
+
+	//创建指定的基类,实现   A* pA = new "A" 这样的操作
+	{
+		baseClass* pSubClassB = ClassInfo::CreateObject("SubClassB");
+		if (pSubClassB)
+			pSubClassB->print();
+	}
 	getchar();
 	return 0;
 }
