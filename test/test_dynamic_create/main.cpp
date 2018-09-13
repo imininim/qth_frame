@@ -1,5 +1,22 @@
 ﻿/***************************
-	动态创建机制
+	动态创建机制测试
+
+原始需求如下:
+	clsas A{}
+	class B : public A{}
+	class C : public A{}
+	
+	A* p = NULL;
+	if (xxx)  p = new B;
+	else      p = new C;
+
+本例子改良如下:
+	A* p = NULL;
+	std::string str;
+	cin >> str;
+
+	p = Create(str);   //如果str=="A" 则 new A，   如果str=="B"则new B  , 否则返回NULL
+	
 ****************************/
 
 //step1 动态库公用头文件
