@@ -35,7 +35,11 @@ int main(int argc, char* argv[])
 	{
 		baseClass* pSubClassB = ClassInfo::CreateObject("SubClassB");
 		if (pSubClassB)
+		{
 			pSubClassB->print();
+			delete pSubClassB;
+		}
+			
 	}
 	getchar();
 	return 0;
