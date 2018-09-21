@@ -75,4 +75,7 @@ add_subdirectory(test/test_dynamic_create)
 #http·şÎñ¶Ë
 add_subdirectory(test/test_http_server)
 
+#md5
+add_subdirectory(test/test_md5)
+
 
