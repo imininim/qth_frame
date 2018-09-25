@@ -78,4 +78,5 @@ add_subdirectory(test/test_http_server)
 #md5
 add_subdirectory(test/test_md5)
 
-
+#base64
+add_subdirectory(test/test_base64)

@@ -60,7 +60,9 @@ BEGIN_NAMESPACE
 	std::string T_to_string( const T& in_t )
 	{
 		static std::stringstream stream_T_to_str;
+		stream_T_to_str.str("");
 		stream_T_to_str.clear();
+		
 		stream_T_to_str << in_t;
 		return stream_T_to_str.str();
 	} 

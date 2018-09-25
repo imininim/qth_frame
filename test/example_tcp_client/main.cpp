@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 		if (strcmp(Buffer, "q") == 0)
 			break; //断开连接
 
-		std::size_t nLen = cin.gcount();
+		std::size_t nLen = (std::size_t)cin.gcount();
 		if (pConnect->Send(Buffer, nLen))	//发送消息
 		{
 			//接收消息
