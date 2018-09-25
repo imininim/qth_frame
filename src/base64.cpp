@@ -13,7 +13,7 @@ BEGIN_NAMESPACE
 
 std::string QTH_UTILITY_EXPORT base64_encode(const std::string& input)
 {
-	typedef base64_from_binary<transform_width<std::string::const_iterator, 6, 8>> Base64EncodeIterator;
+	typedef base64_from_binary<transform_width<std::string::const_iterator, 6, 8> > Base64EncodeIterator;
 	static std::stringstream result;
 	result.str("");
 	result.clear();
