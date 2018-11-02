@@ -1,14 +1,14 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "frame/interface_module_manager.h"
 #include "frame/running_class_info.h"
 #include "utility/logger.h"
 #include <assert.h>
 using namespace QTH_NAME_SPACE;
 
-// ³õÊ¼»¯RunTimeClass¾²Ì¬³ÉÔ±
+// åˆå§‹åŒ–RunTimeClassé™æ€æˆå‘˜
 RunTimeClass* RunTimeClass::	s_pFirst = NULL;
 
-// ³õÊ¼»¯Module¾²Ì¬³ÉÔ±
+// åˆå§‹åŒ–Moduleé™æ€æˆå‘˜
 static char strObject[QTH_MAX_CLASS_NAME_NUM] = "Module";
 struct RunTimeClass Module::classModule = {strObject, 0, sizeof(Module), NULL, NULL, NULL};
 static initRunTimeClass g_initRunTimeClass(&Module::classModule);
@@ -18,7 +18,7 @@ QTH_NAME_SPACE::MessageMap Module::s_mapMessage = {NULL, (QTH_NAME_SPACE::Messag
 
 initRunTimeClass::initRunTimeClass(RunTimeClass* pNewClass)
 {
-	//½«Àà±ðÁ¬½Óµ½Àà±ðÁ´ÖÐ£¬ s_pFirstÎªÖ¸ÏòµÚÒ»¸öÀà±ðÐÅÏ¢µÄÖ¸Õë
+	//å°†ç±»åˆ«è¿žæŽ¥åˆ°ç±»åˆ«é“¾ä¸­ï¼Œ s_pFirstä¸ºæŒ‡å‘ç¬¬ä¸€ä¸ªç±»åˆ«ä¿¡æ¯çš„æŒ‡é’ˆ
 	pNewClass->m_pNext = RunTimeClass::s_pFirst;
 	RunTimeClass::s_pFirst = pNewClass;
 }
@@ -42,23 +42,6 @@ std::string Module::GetModuleName() const
 	return std::string(pClass->m_pClassName);
 }
 
-void Module::SetModuleName(const char* pszName)
-{
-	size_t len = strlen(pszName) + 1;
-	if (len < QTH_MAX_CLASS_NAME_NUM)
-	{
-		RunTimeClass* pClass = GetRuntimeClass();
-		assert(pClass != NULL);
-		//strcpy_s(pClass->m_pClassName, QTH_MAX_CLASS_NAME_NUM, pszName);
-		memset(pClass->m_pClassName, 0, QTH_MAX_CLASS_NAME_NUM);
-		strncpy(pClass->m_pClassName, pszName, len);
-
-	}
-	else
-	{
-		std::cout << "[Ä£¿é] ÉèÖÃÄ£¿éÃû´íÎó£¬ Ô­Òò: Ä£¿éÃû " << pszName << ",¹ý³¤!" << std::endl;
-	}
-}
 
 M_TYPE Module::GetModuleID() const
 {
@@ -116,6 +99,14 @@ RunTimeClass* Module::GetRuntimeClass() const
 QTH_NAME_SPACE::MessageMap* Module::GetMessageMap() const
 {
 	return &Module::s_mapMessage;
+}
+
+Module* Module::isKindOf(const QTH_NAME_SPACE::RunTimeClass* pClass)
+{
+	if (pClass != GetRuntimeClass())
+		return NULL;
+
+	return this;
 }
 
 Module* QTH_NAME_SPACE::RunTimeClass::CreateObject()

@@ -1,9 +1,9 @@
-/********************************
+ï»¿/********************************
 author:		qutianhao
-function:	Ä£¿é»ùÀà
+function:	æ¨¡å—åŸºç±»
 date:		2017/12/27
 tips:
-	ÔËĞĞÊ±ÀàĞÍĞÅÏ¢Ê¶±ğ£¬ Àà±ğĞÅÏ¢Á´, ¶¯Ì¬´´½¨£¬ÏûÏ¢ÍÆËÍ»úÖÆ
+	è¿è¡Œæ—¶ç±»å‹ä¿¡æ¯è¯†åˆ«ï¼Œ ç±»åˆ«ä¿¡æ¯é“¾, åŠ¨æ€åˆ›å»ºï¼Œæ¶ˆæ¯æ¨é€æœºåˆ¶
 *********************************/
 #ifndef RUNNING_CLASS_INFO_H_
 #define RUNNING_CLASS_INFO_H_
@@ -12,13 +12,13 @@ tips:
 class Module;
 class IModuleManager;
 
-//ÏûÏ¢´«µİµÄ·½Ê½Ã¶¾Ù
+//æ¶ˆæ¯ä¼ é€’çš„æ–¹å¼æšä¸¾
 enum ESendMethor
 {
-	SEND_BY_CLIENT,			//ÓÃ»§´«µİÀ´µÄÏûÏ¢
-	SEND_BY_INTERNAL,		//ÄÚ²¿´«µİµÄÏûÏ¢
+	SEND_BY_CLIENT,			//ç”¨æˆ·ä¼ é€’æ¥çš„æ¶ˆæ¯
+	SEND_BY_INTERNAL,		//å†…éƒ¨ä¼ é€’çš„æ¶ˆæ¯
 
-	//Ô¤ÁôÏûÏ¢´«µİ·½Ê½£¬ÒÔÏÂ¿ÉÒÔ×ÔÈ¡ÓÃ£¬ÔÚ²»Í¬Ä£¿éÖĞÒÔ²»Í¬µÄ·½Ê½½øĞĞÏûÏ¢´«µİ
+	//é¢„ç•™æ¶ˆæ¯ä¼ é€’æ–¹å¼ï¼Œä»¥ä¸‹å¯ä»¥è‡ªå–ç”¨ï¼Œåœ¨ä¸åŒæ¨¡å—ä¸­ä»¥ä¸åŒçš„æ–¹å¼è¿›è¡Œæ¶ˆæ¯ä¼ é€’
 	SEND_BY_CUSTOMER_1,		
 	SEND_BY_CUSTOMER_2,		
 	SEND_BY_CUSTOMER_3,		
@@ -31,46 +31,46 @@ enum ESendMethor
 };
 
 BEGIN_NAMESPACE
-	//ÀàĞÍĞÅÏ¢½á¹¹Ìå,ÄÚ½¨list
+	//ç±»å‹ä¿¡æ¯ç»“æ„ä½“,å†…å»ºlist
 	struct QTH_UTILITY_EXPORT RunTimeClass
 	{
-		char* m_pClassName;				//ÀàĞÍÃû³Æ
-		M_TYPE m_id;					//Ä£¿é±êÊ¶·û
-		int m_objSize;					//¶ÔÏóµÄ´óĞ¡
-		Module* (*m_pCreateFn)();		//Ö¸Ïò´´½¨³öÕâ¸öÀàĞÍµÄÖ¸Õë
-		RunTimeClass* m_pBase;			//Ö¸ÏòÕâ¸öÀàĞÍµÄ»ùÀàĞÍĞÅÏ¢
-		RunTimeClass* m_pNext;			//Ö¸ÏòÏÂÒ»¸öÀàĞÍĞÅÏ¢µÄÖ¸Õë
+		char* m_pClassName;				//ç±»å‹åç§°
+		M_TYPE m_id;					//æ¨¡å—æ ‡è¯†ç¬¦
+		int m_objSize;					//å¯¹è±¡çš„å¤§å°
+		Module* (*m_pCreateFn)();		//æŒ‡å‘åˆ›å»ºå‡ºè¿™ä¸ªç±»å‹çš„æŒ‡é’ˆ
+		RunTimeClass* m_pBase;			//æŒ‡å‘è¿™ä¸ªç±»å‹çš„åŸºç±»å‹ä¿¡æ¯
+		RunTimeClass* m_pNext;			//æŒ‡å‘ä¸‹ä¸€ä¸ªç±»å‹ä¿¡æ¯çš„æŒ‡é’ˆ
 		
-		static RunTimeClass* s_pFirst;	//È«¾ÖÖ¸Õë£¬Ö¸ÏòÊ×¸öÀàĞÍµÄĞÅÏ¢
+		static RunTimeClass* s_pFirst;	//å…¨å±€æŒ‡é’ˆï¼ŒæŒ‡å‘é¦–ä¸ªç±»å‹çš„ä¿¡æ¯
 
 		Module* CreateObject();
 	};
 	
-	//³õÊ¼»¯Ã¿¸öÀàĞÍĞÅÏ¢½á¹¹ÌåÒÔÍê³ÉÀàĞÍÁ´±íµÄÁ¬½Ó¹¤×÷
+	//åˆå§‹åŒ–æ¯ä¸ªç±»å‹ä¿¡æ¯ç»“æ„ä½“ä»¥å®Œæˆç±»å‹é“¾è¡¨çš„è¿æ¥å·¥ä½œ
 	struct QTH_UTILITY_EXPORT initRunTimeClass
 	{
 		initRunTimeClass(RunTimeClass* pNewClass);
 	};
 		
 	typedef int (Module::*MSG_DEAL)(void*,int,ESendMethor); 
-	//ÏûÏ¢ĞÅÏ¢½á¹¹
+	//æ¶ˆæ¯ä¿¡æ¯ç»“æ„
 	struct QTH_UTILITY_EXPORT Message
 	{
 		Message(): msgID(0),m_pfnMsg(NULL)
 		{}
 
-		MSG_TYPE msgID;								//ÏûÏ¢ID
-		MSG_DEAL m_pfnMsg;							//ÏûÏ¢´¦Àíº¯Êı
+		MSG_TYPE msgID;								//æ¶ˆæ¯ID
+		MSG_DEAL m_pfnMsg;							//æ¶ˆæ¯å¤„ç†å‡½æ•°
 	};
 		
-	//ÏûÏ¢Ó³Éä±í
+	//æ¶ˆæ¯æ˜ å°„è¡¨
 	struct QTH_UTILITY_EXPORT MessageMap
 	{
-		MessageMap* m_pBaseMap;			//Ö¸Ïò»ùÀàµÄÏûÏ¢Ó³Éä±í
+		MessageMap* m_pBaseMap;			//æŒ‡å‘åŸºç±»çš„æ¶ˆæ¯æ˜ å°„è¡¨
 		Message* m_pMessage;	
 	};
 		
-	//ÏûÏ¢Á´½Ó
+	//æ¶ˆæ¯é“¾æ¥
 	struct QTH_UTILITY_EXPORT pushMessage
 	{
 		pushMessage(Message* pMessages, MSG_TYPE msgID, MSG_DEAL pfnMsg);
@@ -83,38 +83,42 @@ END_NAMESPACE
 	public:
 		Module();
 		virtual ~Module() = 0;
-
-		//»ñÈ¡£¬ÉèÖÃÄ£¿éÃû³Æ,¸ÃÄ£¿éÃû³ÆÎªÀàËùÓĞ
+		//è·å–æ¨¡å—åç§°,å³å®é™…æŒ‡å‘ç±»çš„ç±»åç§°
 		std::string GetModuleName() const;
-		void		SetModuleName(const char* pszName);
-		//»ñÈ¡¡¢ÉèÖÃÄ£¿éID ¸ÃÄ£¿éIDÎªÀàËùÓĞ
+		//è·å–ã€è®¾ç½®æ¨¡å—ID è¯¥æ¨¡å—ID. æ ‡è¯†è¯¥ç±»
 		M_TYPE GetModuleID() const;
 		void   SetModuleID(M_TYPE id);
 
-		//Ïò¸ÃÄ£¿é·¢ËÍÏûÏ¢
+		//å‘è¯¥æ¨¡å—å‘é€æ¶ˆæ¯
 		int SendMsg(MSG_TYPE msgID, void* pData, int len, ESendMethor methor = SEND_BY_INTERNAL);
 				
-		//»ñÈ¡Ä£¿é¹ÜÀíÆ÷
+		//è·å–æ¨¡å—ç®¡ç†å™¨
 		void SetManager(IModuleManager* pManager);
 		IModuleManager* GetManager(void);
 
-		//ĞòÁĞ»¯/·´ĞòÁĞ»¯½Ó¿Ú
+		//åŠ¨æ€ç±»å‹è¯†åˆ«
+		Module* isKindOf(const QTH_NAME_SPACE::RunTimeClass* pClass);
+
+
+		//åºåˆ—åŒ–/ååºåˆ—åŒ–æ¥å£
 		virtual size_t serialize(void* pData, size_t len);
 		virtual size_t unserialize(void* pData, size_t len);
 
-		virtual QTH_NAME_SPACE::RunTimeClass* GetRuntimeClass() const;		// »ñÈ¡RTTIĞÅÏ¢
-		virtual QTH_NAME_SPACE::MessageMap* GetMessageMap() const;			// »ñÈ¡ÏûÏ¢Ó³ÉäĞÅÏ¢								
+		//ç±»å‹ä¿¡æ¯è¯†åˆ«
+
+		virtual QTH_NAME_SPACE::RunTimeClass* GetRuntimeClass() const;		// è·å–RTTIä¿¡æ¯
+		virtual QTH_NAME_SPACE::MessageMap* GetMessageMap() const;			// è·å–æ¶ˆæ¯æ˜ å°„ä¿¡æ¯								
 	public:
 		static QTH_NAME_SPACE::RunTimeClass classModule;
 		static QTH_NAME_SPACE::Message s_messages[QTH_MAX_MESSAGE_NUM];
 		static QTH_NAME_SPACE::MessageMap s_mapMessage;
 
 	private:
-		IModuleManager* m_pManager; //Ä£¿é¹ÜÀíÆ÷µÄÒıÓÃ
+		IModuleManager* m_pManager; //æ¨¡å—ç®¡ç†å™¨çš„å¼•ç”¨
 	};
 
 /***************************************
-RTTI ÉùÃ÷
+RTTI å£°æ˜
 ***************************************/
 #define QTH_DECLARE_DYNMIC(class_name) \
 	public:\
@@ -134,10 +138,10 @@ RTTI ÉùÃ÷
 	{ return new class_name;}
 
 /*************************************************
-RTTI ÊµÏÖ£¬ ²¢ÇÒ½«¸ÃºêÉùÃ÷µÄÀàµÄÀàĞÍĞÅÏ¢´®ÁªÆğÀ´
+RTTI å®ç°ï¼Œ å¹¶ä¸”å°†è¯¥å®å£°æ˜çš„ç±»çš„ç±»å‹ä¿¡æ¯ä¸²è”èµ·æ¥
 
-ºê QTH_IMPLEMENT_DYNMIC  Ö»ÉùÃ÷ÀàÓµÓĞ¶¯Ì¬´´½¨ÄÜÁ¦
-ºóÅÅÃÀ¹ú
+å® QTH_IMPLEMENT_DYNMIC  åªå£°æ˜ç±»æ‹¥æœ‰åŠ¨æ€åˆ›å»ºèƒ½åŠ›
+åæ’ç¾å›½
 *************************************************/
 #define QTH_IMPLEMENT_DYNMIC(class_name, base_class_name) \
 	_QTH_IMPLEMENT_RUNTIME_CLASS(class_name, 0, base_class_name, class_name::CreateObject)
@@ -146,7 +150,7 @@ RTTI ÊµÏÖ£¬ ²¢ÇÒ½«¸ÃºêÉùÃ÷µÄÀàµÄÀàĞÍĞÅÏ¢´®ÁªÆğÀ´
 	_QTH_IMPLEMENT_RUNTIME_CLASS(class_name, class_id, base_class_name, class_name::CreateObject)
 
 /*************************************************
-ÏûÏ¢ÍÆËÍÉùÃ÷
+æ¶ˆæ¯æ¨é€å£°æ˜
 *************************************************/
 #define QTH_DECLARE_MESSAGE()\
 	public:\
@@ -155,7 +159,7 @@ RTTI ÊµÏÖ£¬ ²¢ÇÒ½«¸ÃºêÉùÃ÷µÄÀàµÄÀàĞÍĞÅÏ¢´®ÁªÆğÀ´
 	virtual QTH_NAME_SPACE::MessageMap* GetMessageMap() const;
 
 /*************************************************
-ÏûÏ¢ÍÆËÍÊµÏÖ
+æ¶ˆæ¯æ¨é€å®ç°
 *************************************************/
 #define QTH_IMPLEMENT_MESSAGE(class_name, base_class)\
 	QTH_NAME_SPACE::MessageMap* class_name::GetMessageMap() const\
@@ -168,14 +172,14 @@ RTTI ÊµÏÖ£¬ ²¢ÇÒ½«¸ÃºêÉùÃ÷µÄÀàµÄÀàĞÍĞÅÏ¢´®ÁªÆğÀ´
 
 
 /*************************
-¶¯Ì¬´´½¨£¬RTTI£¬ÏûÏ¢ÍÆËÍ»úÖÆ×ÛºÏÉùÃ÷
+åŠ¨æ€åˆ›å»ºï¼ŒRTTIï¼Œæ¶ˆæ¯æ¨é€æœºåˆ¶ç»¼åˆå£°æ˜
 **************************/
 #define QTH_MODULE_DECLARE(class_name)\
 	QTH_DECLARE_DYNMIC(class_name)\
 	QTH_DECLARE_MESSAGE()
 
 /*************************
-¶¯Ì¬´´½¨£¬RTTI£¬ÏûÏ¢ÍÆËÍ»úÖÆ×ÛºÏÊµÏÖ
+åŠ¨æ€åˆ›å»ºï¼ŒRTTIï¼Œæ¶ˆæ¯æ¨é€æœºåˆ¶ç»¼åˆå®ç°
 **************************/
 #define QTH_MODULE_IMPLEMENT(class_name, base_name)\
 	QTH_IMPLEMENT_DYNMIC(class_name, base_name)\

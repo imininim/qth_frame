@@ -35,7 +35,9 @@ public:
 	
 	//向其他模块发送协议
 	int send_message_to_B(void*, int, ESendMethor);
-
+	
+	//类型信息识别
+	int getKind(void*, int, ESendMethor);
 
 
 	int i;	//使得类A的大小为4

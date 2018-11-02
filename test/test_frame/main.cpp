@@ -39,12 +39,18 @@ int main(int argc, char* argv[])
 			{
 				moduleID = atoi(cmd["module"].c_str());  
 				msgID = atoi(cmd["msg"].c_str());  
+
+				//分派消息
+				pManager->dispatchMessage(moduleID, msgID, NULL, 0); 
+
+				//回过头来看看这条协议的完整形式
+				std::string test = cmd.reverse();
 			}
-			//分派消息
-			pManager->dispatchMessage(moduleID, msgID, NULL, 0); 
+			else 
+			{
+				cout << "协议格式错误, 要求格式为:module=xxx msg=xxx" << endl;
+			}
 			
-			//回过头来看看这条协议的完整形式
-			std::string test = cmd.reverse();
 
 			//继续接受下一条协议
 			memset(pszCmd, 0, 256);
