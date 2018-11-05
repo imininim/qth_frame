@@ -22,6 +22,9 @@ public:
 	virtual long Send(const char* buff, size_t len);
 	//阻塞接收
 	virtual long Recv(char* buff, size_t nRead);
+	//超时接收,使用此种接收方式需要在连接建立后将套接字设置为非阻塞模式
+	virtual long TimeoutRecv(char* buff, size_t nRead, size_t time_out, size_t outvalue);
+
 	//获取连接对端地址
 	virtual bool GetPeerAddress(std::string& strIP, unsigned short& nPort);
 	//获取本端地址

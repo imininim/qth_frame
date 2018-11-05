@@ -33,6 +33,19 @@ BEGIN_NAMESPACE
 		virtual bool isOpen() const														= 0;
 		//设置阻塞模式, false , 阻塞操作直到返回为止,  true 立即返回, 并且伴随一个返回的错误
 		virtual bool setSocketMode(bool mode)											= 0;
+
+		/*
+			函数名: TimeoutRecv
+			功能:	在套接字为非阻塞模式下运行，阻塞程序，直到有数据到来或者超时
+			参数:	
+					buff		读取数据的buff
+					nRead		buff的长度
+					time_out	超时时间,毫秒数 (1s = 1000毫秒)
+					outvalue	检查超时间隔,默认是30毫秒检查一次
+			返回值:
+
+		*/
+		virtual long TimeoutRecv(char* buff, size_t nRead, size_t time_out, size_t outvalue=30)= 0;
 	};
 	
 END_NAMESPACE

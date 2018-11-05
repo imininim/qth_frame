@@ -80,8 +80,13 @@ public:
 	}
 	virtual void OnRecvMsg(ConnectPtr pTCPHandle, const char* pData, size_t len)
 	{
-		if (pTCPHandle)
-			pTCPHandle->SendMsg(pData, len); //消息回显
+		static int i = 0;
+
+		if (pTCPHandle && (++i % 3 == 0)) //每接收3次消息，回复一次
+			pTCPHandle->SendMsg(pData, len); 
+
+		if (i % 10 == 0)				//每接收10次消息，关闭一个连接
+			pTCPHandle->Close();
 	}
 
 	virtual void OnCommond(const char* pData, size_t len)

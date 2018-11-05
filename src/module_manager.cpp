@@ -244,6 +244,13 @@ bool ModuleManager::dispatchMessage(M_TYPE moduleID,MSG_TYPE msgID, void* p, int
 	return true;
 }
 
+void ModuleManager::execMessageAll(MSG_TYPE msgID, void* p, int len)
+{
+	for (int i = 0; i < QTH_MAX_PROTOCOL_NUM; ++i)
+		if(m_modules[i] != NULL)
+			m_modules[i]->SendMsg(msgID, p, len, SEND_BY_CLIENT);
+}
+
 Module* ModuleManager::GetModuleByName(const char* pszName)
 {
 	for (M_TYPE i = 0; i < QTH_MAX_PROTOCOL_NUM; ++i)
@@ -259,5 +266,7 @@ Module* ModuleManager::GetModuleByID(M_TYPE moduleID)
 {
 	return m_modules[moduleID];
 }
+
+
 
 END_NAMESPACE

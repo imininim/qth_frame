@@ -30,6 +30,9 @@ public:
 		
 	//消息派发
 	virtual bool dispatchMessage(M_TYPE moduleID,MSG_TYPE msgID, void* p, int len) = 0;
+	//派发消息到所有模块
+	virtual void execMessageAll(MSG_TYPE msgID, void* p, int len)			= 0;
+
 	//模块信息打印
 	virtual void print()											{}
 	//获取模块所属用户

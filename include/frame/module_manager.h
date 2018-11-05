@@ -38,8 +38,11 @@ public:
 	virtual size_t serialize(void* pData, size_t len);
 	virtual size_t unserialize(void* pData, size_t len);
 
-	//消息派发
+	//消息派发,将一条消息派发给指定的模块
 	virtual bool dispatchMessage(M_TYPE moduleID,MSG_TYPE msgID, void* p, int len);
+	//通用消息派发,将一条消息派发给所有的模块
+	virtual void execMessageAll(MSG_TYPE msgID, void* p, int len);
+
 	//模块信息打印
 	virtual void print();
 

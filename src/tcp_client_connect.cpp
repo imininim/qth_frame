@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "asio/tcp_client_connect.h"
+#include "boost/thread.hpp"
 
 using namespace ::boost::asio::ip;
 BEGIN_NAMESPACE
@@ -85,7 +86,9 @@ long CTcpClientConnect::Recv(char* buff, size_t nRead)
 
 	boost::system::error_code ec;
 	long nRet = m_socket.read_some(boost::asio::buffer(buff, nRead), ec);
-	if (ec)
+	if (ec && ec.value()==10035) //10035表示在非阻塞套接字下没有读取数据并立即返回的情况
+		return 0;
+	else if(ec)
 	{
 		m_errCode = ec.value();
 		m_errMsg = ec.message();
@@ -94,7 +97,31 @@ long CTcpClientConnect::Recv(char* buff, size_t nRead)
 
 	return nRet;
 }
-	
+
+
+long CTcpClientConnect::TimeoutRecv(char* buff, size_t nRead, size_t time_out, size_t outvalue/* = 30*/)
+{
+	if (buff == NULL || nRead == 0) return 0;
+
+	size_t time = 0;
+	long nRet = 0;
+
+	while (time < time_out) //只要当前尚未超时
+	{
+		nRet = Recv(buff, nRead);
+		if (nRet == 0)
+		{
+			time += outvalue;
+			boost::this_thread::sleep(boost::posix_time::millisec(outvalue));
+		}
+		else
+			break;
+	}
+
+	return nRet;
+}
+
+
 bool CTcpClientConnect::GetPeerAddress(std::string& strIP, unsigned short& nPort)
 {
 	if (isOpen())
