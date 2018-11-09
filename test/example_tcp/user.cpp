@@ -25,3 +25,9 @@ void StoreUser::SendMsgToClient(const char* pData, size_t len)
 		m_pConnect->SendMsg(pData, len);
 }
 
+void StoreUser::resetManager(IModuleManager* pManager)
+{
+	SAFE_DELETE(m_pModuleManager);
+	m_pModuleManager = pManager;
+}
+

@@ -26,9 +26,10 @@ public:
 	virtual unsigned GetUserID()					{ return m_id;}
 	//通过用户接口获取用户模块管理器
 	virtual IModuleManager* GetManager()			{ return m_pModuleManager; }
+	virtual void resetManager(IModuleManager* pManager);
 	//通过用户接口向连接的对端发送消息
 	virtual void SendMsgToClient(const char* pData, size_t len);
-	virtual void SendMsgToServer(int no, const char* pData, size_t len){}
+	
 private:
 	unsigned		m_id;						//用户临时连接ID
 	int  m_bAccountLogin;						//账户是状态
