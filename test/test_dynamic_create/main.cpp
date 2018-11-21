@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 	
 	typedef RunTimeClassEx<baseClass>  ClassInfo;
 
-	std::vector<baseClass*> moduleMap(NULL);
+	std::vector<baseClass*> moduleMap;
 	moduleMap.resize(UCHAR_MAX);
 	for (int i = 0; i < UCHAR_MAX; ++i)
 		moduleMap[i] = NULL;
