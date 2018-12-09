@@ -16,6 +16,14 @@ CHttpRequest::CHttpRequest() {
 
 CHttpRequest::~CHttpRequest() {}
 
+std::string CHttpRequest::Host2Ip(const std::string &host) {
+	struct hostent *p = gethostbyname(host.c_str());
+	for (int i = 0; p->h_addr_list[i]; i++) {
+		return inet_ntoa(*(struct in_addr *)p->h_addr_list[i]);
+	}
+	return "";
+}
+
 int CHttpRequest::GetPort(const std::string &url) const {
 	int port = 80;
 	const char *tmp = url.c_str();
@@ -109,9 +117,11 @@ std::string CHttpRequest::HttpRequestExec(const std::string &url, const std::str
 	cerr << request << endl;
 
 	if (!m_tcpClientPtr) {
-		m_tcpClientPtr.reset(new CTcpClientConnect());
+		//m_tcpClientPtr.reset(new CTcpClientConnect());
+		m_tcpClientPtr.reset(new SimpleTcpClientConnect());
 	}
-	if (!m_tcpClientPtr->Connect(GetHost(url), (unsigned short)GetPort(url))) {
+	//if (!m_tcpClientPtr->Connect("127.0.0.1", 8888)) {
+	if (!m_tcpClientPtr->Connect(Host2Ip(GetHost(url)), (unsigned short)GetPort(url))) {
 		//_LOG_DEBUG(g_logger, "[连接管理器]客户端连接... %p, sizeof(CTcpClientConnect)=%u", p, sizeof(CTcpClientConnect));
 		cerr << "content err" << endl;
 		cerr << m_tcpClientPtr->GetErrorInfo() << endl;
@@ -121,19 +131,10 @@ std::string CHttpRequest::HttpRequestExec(const std::string &url, const std::str
 
 	m_tcpClientPtr->Send(request.c_str(), request.size());
 
+	cerr <<"send ok" << endl;
 	std::string response;
-	while (1) {
-		char tmp[10000];
-		long ret = m_tcpClientPtr->Recv(tmp, 10000);
-		if (ret > 0) {
-			response += string(tmp, ret);
-		} else if (ret < 0) {
-			break;
-		} else {
-			break;
-		}
-	}
-
+	long ret = m_tcpClientPtr->Recv(response);
+	cerr << "get resp:" << endl;
 	return response;
 }
 
@@ -157,6 +158,7 @@ void CHttpRequest::SetParam(const std::string &key, const std::string &value) {
 
 void CHttpRequest::Debug(const std::string &url) const {
 	std::cerr << "Host: " << GetHost(url) << std::endl;
+	std::cerr << "Ip: " << Host2Ip(GetHost(url)) << std::endl;
 	std::cerr << "port: " << GetPort(url) << std::endl;
 	std::cerr << "Uri: " << GetUri(url) << std::endl;
 }

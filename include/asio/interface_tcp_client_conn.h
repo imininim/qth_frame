@@ -22,6 +22,7 @@ BEGIN_NAMESPACE
 		virtual long Send(const char* buff, size_t len)									= 0;
 		//阻塞接收
 		virtual long Recv(char* buff, size_t nRead)										= 0;
+		virtual long Recv(std::string &buff)                                            = 0;
 		//获取连接对端地址
 		virtual bool GetPeerAddress(std::string& strIP, unsigned short& nPort)			= 0; 
 		//获取本端地址

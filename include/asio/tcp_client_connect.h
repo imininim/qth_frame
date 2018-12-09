@@ -22,6 +22,7 @@ public:
 	virtual long Send(const char* buff, size_t len);
 	//阻塞接收
 	virtual long Recv(char* buff, size_t nRead);
+	virtual long Recv(std::string &buff);
 	//超时接收,使用此种接收方式需要在连接建立后将套接字设置为非阻塞模式
 	virtual long TimeoutRecv(char* buff, size_t nRead, size_t time_out, size_t outvalue);
 
@@ -43,5 +44,42 @@ private:
 	int m_errCode;
 	std::string m_errMsg;
 };
+
+class SimpleTcpClientConnect: public ITcpClientConnect
+{
+public:
+	SimpleTcpClientConnect(void);
+	virtual ~SimpleTcpClientConnect();
+
+	//连接
+	virtual bool Connect(const std::string& strIP, unsigned short nPort);
+	//关闭连接
+	virtual bool Close(void);
+	//阻塞发送
+	virtual long Send(const char* buff, size_t len);
+	//阻塞接收
+	virtual long Recv(char* buff, size_t nRead);
+	virtual long Recv(std::string &buff);
+	//超时接收,使用此种接收方式需要在连接建立后将套接字设置为非阻塞模式
+	virtual long TimeoutRecv(char* buff, size_t nRead, size_t time_out, size_t outvalue);
+
+	//获取连接对端地址
+	virtual bool GetPeerAddress(std::string& strIP, unsigned short& nPort);
+	//获取本端地址
+	virtual bool GetLocalAddress(std::string& strIP, unsigned short& nPort);
+	//获取最后一次套接字操作的错误信息
+	virtual  const int GetErrorCode() const;
+	virtual  const std::string& GetErrorInfo() const;
+	//连接是否有效
+	virtual bool isOpen() const;
+	//设置阻塞模式
+	virtual bool setSocketMode(bool mode);
+private:
+	int m_socket;
+
+	int m_errCode;
+	std::string m_errMsg;
+};
+
 END_NAMESPACE
 

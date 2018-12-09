@@ -80,3 +80,11 @@ add_subdirectory(test/test_md5)
 
 #base64
 add_subdirectory(test/test_base64)
+
+#http_request
+add_subdirectory(test/test_http_request)
+
+#mysql
+add_subdirectory(test/example_mysql)
+
+

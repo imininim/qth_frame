@@ -38,6 +38,7 @@ private:
 	std::string GetUri(const std::string &url) const;
 	std::string GetHost(const std::string &url) const;
 	std::string HttpRequestExec(const std::string &url, const std::string &data);
+	static std::string Host2Ip(const std::string &host);
 private:
 	enum { INF=999999 };
 	typedef shared_ptr<ITcpClientConnect> TcpClientPtr;
