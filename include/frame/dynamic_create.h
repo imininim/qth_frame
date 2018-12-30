@@ -10,6 +10,7 @@ tips:
 #ifndef DYNAMIC_CREATE_H_
 #define DYNAMIC_CREATE_H_
 #include "frame/macro.h"
+#include <string.h>
 
 //消息来源枚举
 enum ESendMethor
@@ -26,17 +27,22 @@ BEGIN_NAMESPACE
 	{
 	public:
 		M_TYPE classID;						//类ID
-		char* m_pClassName;					//类名称	
+		std::string m_strClassName;			//类名称	
 		RunTimeClassEx* m_pNext;			//指向下一个类节点
 		
 		T* (*m_pCreateFn)();				//指向创建出这个类对象的函数
 		T* CreateObject();	
 
-		static RunTimeClassEx* s_pFirst;	//指向首类节点
-		static T* CreateObject(const char* strObj);
+		static RunTimeClassEx* s_pFirst;			//指向首类节点
+		static T* CreateObject(M_TYPE classID);		//依据类名ID创建类对象
+		static T* CreateObject(const char* strObj); //依据类名称创建类对象
+
+		//依据类ID 查找类名称
+		static const char*			findRunTimeClass(M_TYPE classID);
+		//依据类名称查找类ID, 查找不到返回 QTH_MAX_PROTOCOL_NUM
+		static M_TYPE				findRunTimeClass(const char* strObj);
 	};
-		
-	
+			
 	template<class T> RunTimeClassEx<T>* RunTimeClassEx<T>::s_pFirst = NULL;
 	
 	template<class T>
@@ -52,12 +58,52 @@ BEGIN_NAMESPACE
 		typedef RunTimeClassEx<T>  ClassInfo;
 		for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
 		{
-			if (strObj && it->m_pClassName && strcmp(strObj, it->m_pClassName) == 0)
+			if (strObj && strcmp(strObj, it->m_strClassName.c_str()) == 0)
 				return it->CreateObject();
 		}
 
 		return NULL;
 	}
+
+	template<class T>
+	T* RunTimeClassEx<T>::CreateObject(M_TYPE classID)
+	{
+		typedef RunTimeClassEx<T>  ClassInfo;
+		for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
+		{
+			if (classID == it->classID)
+				return it->CreateObject();
+		}
+
+		return NULL;
+	}
+
+	template<class T>
+	const char* RunTimeClassEx<T>::findRunTimeClass(M_TYPE classID)
+	{
+		typedef RunTimeClassEx<T>  ClassInfo;
+		for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
+		{
+			if (classID == it->classID)
+				return it->m_strClassName.c_str();
+		}
+
+		return NULL;
+	}
+
+	template<class T>
+	M_TYPE RunTimeClassEx<T>::findRunTimeClass(const char* strObj)
+	{
+		typedef RunTimeClassEx<T>  ClassInfo;
+		for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
+		{
+			if (strObj && strcmp(strObj, it->m_strClassName.c_str()) == 0)
+				return it->classID;
+		}
+
+		return QTH_MAX_PROTOCOL_NUM;
+	}
+
 	
 	//完成类型信息的连接工作
 	template<class RTC>

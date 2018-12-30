@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 	//注意，这里没有实际包含 A.h 和 B.h, 但是创建出来的类是 class SubClassA 和 class SubClassB
 	for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
 	{
-		cout << "类名:" << it->m_pClassName << endl;
+		cout << "类名:" << it->m_strClassName.c_str() << endl;
 		cout << "ID:" << (unsigned int)it->classID << endl;
 		cout << "创建地址:" << it->m_pCreateFn << endl;
 		cout << "---------------------" << endl;

@@ -170,16 +170,14 @@ BEGIN_NAMESPACE
 	/*小型对象池， 继承使用*/
 	template
 		<
-			template<class,class>class ThreadingModel = ::Loki::ClassLevelLockable,		//默认使用多线程
-			std::size_t chunkSize = 4096,												//每一页的内存大小
-			std::size_t maxObjSize = 64													//小型对象最大能够分配对象的大小，超过此大小的对象转由::operator new 处理
+			template<class,class>class ThreadingModel = ::Loki::ClassLevelLockable		//默认使用多线程
 		>
 	class SmallObject
 	{
 	public:
 		virtual ~SmallObject(){}
 
-		typedef Singleton<SmallObjAllocator, 0, QTH_NAME_SPACE::CreateUsingNew, Loki::SingleThreaded> AllocSingeleton;
+		typedef Singleton<SmallObjAllocator, 0, QTH_NAME_SPACE::CreateUsingNew, ThreadingModel> AllocSingeleton;
 
 	protected:
 		SmallObject(){}

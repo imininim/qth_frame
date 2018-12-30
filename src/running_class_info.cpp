@@ -9,7 +9,7 @@ using namespace QTH_NAME_SPACE;
 RunTimeClass* RunTimeClass::	s_pFirst = NULL;
 
 // 初始化Module静态成员
-static char strObject[QTH_MAX_CLASS_NAME_NUM] = "Module";
+static char strObject[256] = "Module";
 struct RunTimeClass Module::classModule = {strObject, 0, sizeof(Module), NULL, NULL, NULL};
 static initRunTimeClass g_initRunTimeClass(&Module::classModule);
 

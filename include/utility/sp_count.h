@@ -12,7 +12,7 @@
 BEGIN_NAMESPACE
 
 
-template<template<class,class>class ThreadingModel, std::size_t, std::size_t>
+template<template<class,class>class ThreadingModel>
 class SmallObject;
 
 template<class T>

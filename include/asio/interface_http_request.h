@@ -1,4 +1,4 @@
-/*******************************
+﻿/*******************************
 function:	http 客户端连接 包装
 date:		2018/11/15
 version:	v1.0
@@ -10,7 +10,7 @@ tips:		提供http 客户端连接的简便方式
 
 BEGIN_NAMESPACE
 
-class IHttpRequest {
+class QTH_UTILITY_EXPORT IHttpRequest {
 public:
 	virtual ~IHttpRequest(){}
 
