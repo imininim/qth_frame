@@ -1,10 +1,9 @@
-/*******************************
+﻿/*******************************
 function:	连接关系型数据库的接口
 date:		2018/12/07
 version:	v1.0
 tips:		提供sql 数据库客户端接口
 ********************************/
-
 
 #ifndef __interface_sql_databases_h__
 #define __interface_sql_databases_h__
