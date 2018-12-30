@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "db/mysql_databases.h"
-
+#if 0
 
 BEGIN_NAMESPACE
-Mysql::~Mysql() {
+	Mysql::~Mysql() {
 
 }
 //初始化数据库账号密码
@@ -67,4 +67,6 @@ bool Mysql::Select(const std::string &query, std::vector<std::vector<std::string
 	return true;
 }
 
+
 END_NAMESPACE
+#endif

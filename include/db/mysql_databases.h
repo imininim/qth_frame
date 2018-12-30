@@ -1,4 +1,4 @@
-/*******************************
+﻿/*******************************
 function:	连接关系型数据库的接口
 date:		2018/12/07
 version:	v1.0
@@ -7,6 +7,8 @@ tips:		提供 mysql 数据库客户端接口
 
 #ifndef __mysql_databases_h__
 #define __mysql_databases_h__
+
+#if 0
 
 #include "db/interface_sql_databases.h"
 #include "mysql/mysql.h"
@@ -35,4 +37,8 @@ private:
 };
 
 END_NAMESPACE
+
+#endif
+
+
 #endif

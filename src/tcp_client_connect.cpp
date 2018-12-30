@@ -2,6 +2,17 @@
 #include "asio/tcp_client_connect.h"
 #include "boost/thread.hpp"
 
+#if defined (WIN32) || defined(WIN64)
+
+#define CLOSE_SOCKET(sock) closesocket(sock)
+
+#else
+
+#define CLOSE_SOCKET(sock) close(sock)
+
+#endif
+
+
 using namespace ::boost::asio::ip;
 BEGIN_NAMESPACE
 
@@ -203,7 +214,6 @@ bool CTcpClientConnect::setSocketMode(bool mode)
 
 }
 
-
 SimpleTcpClientConnect::SimpleTcpClientConnect(): m_socket(-1)
 {
 	m_errCode = 0;
@@ -240,7 +250,7 @@ bool SimpleTcpClientConnect::Close(void)
 	if (m_socket == -1)
 		return true;
 
-	close(m_socket);
+	CLOSE_SOCKET(m_socket);
 	return true;
 }
 
@@ -248,7 +258,7 @@ long SimpleTcpClientConnect::Send(const char* buff, size_t len)
 {
 	if (buff == NULL || len == 0) return -1;
 
-	int sent = 0;
+	size_t sent = 0;
 	while (sent < len) {
 		int tmpres = send(m_socket, buff+sent, len-sent, 0);
 		if (tmpres == -1) {
@@ -355,7 +365,6 @@ bool SimpleTcpClientConnect::setSocketMode(bool mode)
 	return true;
 
 }
-
 
 END_NAMESPACE
 
