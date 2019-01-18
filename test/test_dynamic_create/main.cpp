@@ -1,25 +1,11 @@
 ﻿/***************************
-	动态创建机制测试
-
-原始需求如下:
-	clsas A{}
-	class B : public A{}
-	class C : public A{}
-	
-	A* p = NULL;
-	if (xxx)  p = new B;
-	else      p = new C;
-
-本例子改良如下:
-	A* p = NULL;
-	std::string str;
-	cin >> str;
-
-	p = Create(str);   //如果str=="A" 则 new A，   如果str=="B"则new B  , 否则返回NULL
-	
+function: 类的自动创建，管理， 模块划分 以及消息处理 测试
 ****************************/
 //基类接口
 #include "interface.h"
+
+//直接使用子类对象才需要包含其头文件
+#include "A.h"
 
 
 using std::cout;
@@ -28,63 +14,58 @@ using std::endl;
 int main(int argc, char* argv[])
 {
 	using namespace QTH_NAME_SPACE;
-	
-	typedef RunTimeClassEx<baseClass>  ClassInfo;
 
-	std::vector<baseClass*> moduleMap;
-	moduleMap.resize(UCHAR_MAX);
-	for (int i = 0; i < UCHAR_MAX; ++i)
-		moduleMap[i] = NULL;
-
-	//遍历所有继承于baseClass，并且声明了动态创建的类
-	//注意，这里没有实际包含 A.h 和 B.h, 但是创建出来的类是 class SubClassA 和 class SubClassB
-	for (ClassInfo* it = ClassInfo::s_pFirst; it != NULL; it = it->m_pNext)
 	{
-		cout << "类名:" << it->m_strClassName.c_str() << endl;
-		cout << "ID:" << (unsigned int)it->classID << endl;
-		cout << "创建地址:" << it->m_pCreateFn << endl;
-		cout << "---------------------" << endl;
+		//静态函数，看看能够创建的类对象有哪些
+		std::string classInfo = ClassManager::dump();
+		cout << classInfo.c_str() << endl;
 
-		baseClass* pNewClass = it->CreateObject(); //创建其派生对象
-		if (pNewClass)
-		{
-			pNewClass->print(); //执行器派生类的print
-			moduleMap[it->classID] = pNewClass;
-		}
+		//创建一个这样的对象,这个对象无法被拷贝，接口之中所有的模块都会被自动创建 
+		ClassManager m;
 		
-		cout << endl;
-	}
+		//可以直接获取各个模块,并且无耦合的调用各个模块的接口
+		baseClass* pA = m.GetModuleByID(MODULE_A);
+		if (!pA) return 0;
 
-	//创建指定的基类,实现   A* pA = new "A" 这样的操作
-	{
-		cout << "通过字符串创建类 SubClassB:" << endl; 
-		baseClass* pSubClassB = ClassInfo::CreateObject("SubClassB");
-		if (pSubClassB)
+		pA->print(); //调用模块A的虚函数
+
+		baseClass* pB = m.GetModuleByID(MODULE_B);
+		if (!pB) return 0;
+
+		pB->print();//调用模块B的虚函数
+
+		//也可以直接转化为子类的指针进行调用,但是需要包含 SubClassA所在的头文件，使得模块之间产生耦合
+		SubClassA* pSubClassA = (SubClassA*)pA;
+		pSubClassA->direct();
+
+		//如果你觉得直接的指针强行转化不安全，你可以先验证一下 pA 是否指向一个 SubClassA 对象
+		if (pA->GetRuntimeClass() == RUN_CLASS_INFO(SubClassA))
+			cout << "pA 是一个指向 SubClassA 对象的指针!" << endl;
+		else
+			cout << "PA 不是一个指向 SubClassA 对象的指针" << endl;
+		
+		//给模块A 发送消息1
+		pA->SendMsg(1);
+		//给模块A 发送消息2 并携带参数，   参数是void* 类型，可以传入任何结构,只要在消息处理的时候使用相同的结构就行
+		std::string str = "模块A消息2参数";
+		pA->SendMsg(2, &str, sizeof(str));
+
+		//尝试给模块B 发送消息，因为模块B没有声明可以处理消息，所以应该是返回失败
+		int errCode = pB->SendMsg(1);
+		if (errCode < MEC_OK)
 		{
-			pSubClassB->print();
-			delete pSubClassB;
-		}
+			/*
+				MEC_OK  ==  0,  表示调用成功, 其他 errCode < 0 都是表示调用失败, errCode > 0 是使用者自定义的返回值
+			*/
+
+			std::cout << "模块B 执行消息1错误，错误码=" << errCode << endl;
 			
-	}
-
-	//消息派发
-	{
-		cout << "module=1 msg=1:" << endl;
-
-		//获取消息列表
-		const baseClass::MSG_DEAL* pFunc = moduleMap[1]->GetMessageMap();
-		//获取指令1
-		const baseClass::MSG_DEAL pDeal1 = pFunc[1];
-		if (pDeal1) //执行指令1
-		{
-			(moduleMap[1]->*pDeal1)(NULL,0,SEND_BY_CLIENT);
 		}
-		
+
+		//执行事件,所有的模块都会执行
+		m.allModuleExcEvent(EVENT_HELLO_WORLD);
 	}
-
-	for (int i = 0; i < UCHAR_MAX; ++i)
-		SAFE_DELETE(moduleMap[i]);
-
+			
 	getchar();
 	return 0;
 }
