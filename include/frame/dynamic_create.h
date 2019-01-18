@@ -335,7 +335,7 @@ bool CDataManager<T, moduleMaxNum, OwnerType, eventStart, eventEnd>::doRegisterM
 		return false;	
 
 	//获取该模块的消息列表
-	const T::MSG_DEAL* pMessageMap = pModule->GetMessageMap();
+	const typename T::MSG_DEAL* pMessageMap = pModule->GetMessageMap();
 	if (!pMessageMap)
 		return false;
 	
