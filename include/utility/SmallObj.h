@@ -278,7 +278,7 @@ BEGIN_NAMESPACE
 
 
 	
-	template<class T, std::size_t blockSize = sizeof(T) > 
+	template<class T, std::size_t blockSize> 
 	class CreateFixedObjectNew
 	{
 	public:
@@ -311,7 +311,7 @@ BEGIN_NAMESPACE
 	class FixedObject
 	{
 	public:
-		typedef Singleton<FixedAllocator, 0, CreateFixedObjectNew<FixedAllocator>, ThreadingModel> AllocSingeleton;
+		typedef Singleton<FixedAllocator, 0, CreateFixedObjectNew<FixedAllocator, sizeof(T)>, ThreadingModel> AllocSingeleton;
 
 		virtual ~FixedObject(){}
 	protected:
