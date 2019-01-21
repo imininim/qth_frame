@@ -36,6 +36,17 @@ struct C: public B
 };
 
 
+//任意类型对象池
+struct D: public QTH_NAME_SPACE::FixedObject<D>
+{
+	D(){ cout << "D::D" << endl;}
+	virtual ~D(){ cout << "D::~D" << endl;}
+
+	int d;
+	int f;
+	int c;
+};
+
 #include <vector>
 int main(int argc, char* argv[])
 {
@@ -91,13 +102,13 @@ int main(int argc, char* argv[])
 		delete[] vecB;
 	}
 	/////////////////////////////////////////////////////////////////////////使用4
-	////任意对象的内存池应用
-	//{
-	//	cout << "创建一个class D，然后释放..." << endl;
-	//	D* pD = new D;
-	//	pD->d = 1;
-	//	delete pD;
-	//}
+	//任意对象的内存池应用
+	{
+		cout << "创建一个class D，然后释放..." << endl;
+		D* pD = new D;
+		pD->d = 1;
+		delete pD;
+	}
 
 
 	getchar();
