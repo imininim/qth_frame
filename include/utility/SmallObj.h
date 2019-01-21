@@ -333,9 +333,6 @@ BEGIN_NAMESPACE
 
 		static void operator delete(void* p, std::size_t size) throw()
 		{
-			//这里应该不允许继承的情况
-			assert(sizeof(T) == size);
-
 			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
 			AllocSingeleton::Instance().Deallocate(p);
 		}
@@ -352,9 +349,6 @@ BEGIN_NAMESPACE
 
 		static void operator delete(void* p, const std::nothrow_t&) throw()
 		{
-			//这里应该不允许继承的情况
-			assert(sizeof(T) == size);
-
 			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
 			AllocSingeleton::Instance().Deallocate(p);
 		}
