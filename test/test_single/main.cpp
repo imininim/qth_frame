@@ -47,9 +47,9 @@ public:
 	}
 };
 
-struct C: public QTH_NAME_SPACE::Singleton<C, 0, CreateMethod>
+struct C: public QTH_NAME_SPACE::Singleton<C, 0, CreateMethod<C> >
 {
-	friend class QTH_NAME_SPACE::Singleton<C, 0, CreateMethod>;
+	friend class QTH_NAME_SPACE::Singleton<C, 0, CreateMethod<C> >;
 	int i;
 };
 

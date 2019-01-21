@@ -27,7 +27,7 @@ class CProcessor;
 
 
 class QTH_UTILITY_EXPORT CProcessorMgr: 
-	public Singleton<CProcessorMgr, 0, QTH_NAME_SPACE::CreateUsingNew, ::Loki::ClassLevelLockable>, private Nocopyable 
+	public Singleton<CProcessorMgr, 0, QTH_NAME_SPACE::CreateUsingNew<CProcessorMgr>, ::Loki::ClassLevelLockable>, private Nocopyable 
 {
 	friend class Singleton<CProcessorMgr>;
 public:

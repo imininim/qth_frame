@@ -19,6 +19,9 @@ struct A
 //需要使用小对象池的类
 struct B: public QTH_NAME_SPACE::SmallObject<>
 {
+	B(){ cout << "B::B" << endl;}
+	~B(){ cout << "B::~B" << endl;}
+
 	int p;
 	int d;
 };
@@ -26,8 +29,21 @@ struct B: public QTH_NAME_SPACE::SmallObject<>
 //所有继承类都可以自动享有基类的对象池
 struct C: public B
 {
+	C(){ cout << "C::C" << endl;}
+	~C(){ cout << "C::~C" << endl;}
+
 	int c;
 };
+
+//任意大小的类对象使用内存池测试(注意: 类D 无法被继承)
+struct D: public QTH_NAME_SPACE::FixedObject<D>
+{
+	D(){ cout << "D::D" << endl;}
+	~D(){ cout << "D::~D" << endl;}
+
+	int d;
+};
+
 
 #include <vector>
 int main(int argc, char* argv[])
@@ -60,25 +76,34 @@ int main(int argc, char* argv[])
 
 	///////////////////////////////////////////////////////////////////////////使用3
 	//小对象池,  重载 new/delete
-	B* pB = new B;
-	pB->d = 3;
-	pB->p = 4;
-	delete pB;
-
-	C* pC = new C;
-	B* pC2 = new C;
-	delete pC;
-	delete pC2;
-
-	/////////////////////////////////////重载 new[]/delete[]    仅在 linux 下享受内存池效果， windows 下并未重载operator new[]/delete[]
-	B* vecB = new B[5];
-	for (int i = 0; i < 5; ++i)
 	{
-		vecB[i].d = i;
+		cout << "创建一个class B，然后释放..." << endl;
+		B* pB = new B;
+		pB->d = 3;
+		pB->p = 4;
+		delete pB;
+
+		cout << "创建一个class C，然后释放..." << endl;
+		C* pC = new C;
+		delete pC;
+
+		/////////////////////////////////////重载 new[]/delete[]    仅在 linux 下享受内存池效果， windows 下并未重载operator new[]/delete[]
+		cout << "以new[] 创建5个class B，然后释放..." << endl;
+		B* vecB = new B[5];
+		for (int i = 0; i < 5; ++i)
+		{
+			vecB[i].d = i;
+		}
+
+		delete[] vecB;
 	}
-
-	delete[] vecB;
-
+	///////////////////////////////////////////////////////////////////////////使用4
+	//任意对象的内存池应用
+	{
+		cout << "创建一个class D，然后释放..." << endl;
+		D* pD = new D;
+		delete pD;
+	}
 
 
 	getchar();

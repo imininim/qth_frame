@@ -13,12 +13,7 @@ tips:
 
 BEGIN_NAMESPACE
 
-	//短式声明
-	template<class T>	class CreateUsingNew;
-
-	template<class T, size_t longevity, template<class>class Creationpolicy, template<class,class>class ThreadingModel>
-	class Singleton;
-
+	
 	/*每页的大小*/
 	struct PageSize
 	{
@@ -82,12 +77,24 @@ BEGIN_NAMESPACE
 	};
 	
 	/*
-		大小固定的对象池
+		function: 大小固定的内存块分配
+		params:
+			blockSize	每一块内存的大小
+			pageSize	每一页内存的大小， 通常为块内存大小的倍数
+
+		例:
+			FixedAllocator fa(sizeof(int), sizeof(int)*256);
+			
+			分配
+			int* pI = (int*)fa.Allocate();
+
+			//释放
+			fa.Deallocate(pI);
 	*/
 	class QTH_UTILITY_EXPORT FixedAllocator
 	{
 	public:
-		FixedAllocator(void);
+		FixedAllocator(const BlockSize& blockSize = BlockSize(0), const PageSize& pageSize = PageSize(0));
 		~FixedAllocator();
 
 		void Initialize(const BlockSize& blockSize, const PageSize& pageSize);
@@ -109,7 +116,7 @@ BEGIN_NAMESPACE
 
 		void DoDeallocate( void * p );
 		bool MakeNewChunk( void );
-		Chunk * VicinityFind( void * p ) const;
+		Chunk * VicinityFind( void * p ) const; //线性查找
 	private:
 		static unsigned char MinObjectsPerChunk_;			//每各chunk_ 最小多少个对象
 		static unsigned char MaxObjectsPerChunk_;			//每个chunk_ 最大多少个对象
@@ -129,7 +136,22 @@ BEGIN_NAMESPACE
 	};
 	
 	/*
-		任意大小对象的对象池
+		function: 小型对象内存块分配
+		params:
+			pageSize	每一页内存的大小
+			maxObjSize	能够享受到内存池特性的最大对象大小
+
+		例:
+			SmallObjAllocator soa(PageSize(4096*2), MaxObjSize(64));
+			
+			分配
+			int* pI = (int*)soa.Allocate( sizeof(int) );
+
+			double* pD = (double*)soa.Allocate( sizeof(double) );
+
+			//释放
+			soa.Deallocate(pI);
+			soa.Deallocate(pD);
 	*/
 	class QTH_UTILITY_EXPORT SmallObjAllocator
 	{
@@ -167,7 +189,20 @@ BEGIN_NAMESPACE
 		std::size_t pageSize_;											
 	};
 
-	/*小型对象池， 继承使用*/
+
+	/*
+		function: 小型对象池, 小于64Byte 的对象继承此类自动享用内存池分配.  
+		
+		例:
+			class A : public SmallObject<>
+			{};
+
+			//申请
+			A* pA = new A;
+
+			//释放
+			delete pA;
+	*/
 	template
 		<
 			template<class,class>class ThreadingModel = ::Loki::ClassLevelLockable		//默认使用多线程
@@ -177,7 +212,7 @@ BEGIN_NAMESPACE
 	public:
 		virtual ~SmallObject(){}
 
-		typedef Singleton<SmallObjAllocator, 0, QTH_NAME_SPACE::CreateUsingNew, ThreadingModel> AllocSingeleton;
+		typedef Singleton<SmallObjAllocator, 0, QTH_NAME_SPACE::CreateUsingNew<SmallObjAllocator>, ThreadingModel> AllocSingeleton;
 
 	protected:
 		SmallObject(){}
@@ -213,19 +248,7 @@ BEGIN_NAMESPACE
 			AllocSingeleton::Instance().Deallocate(p);
 		}
 
-		// //placement new/delete
-		// inline static void* operator new(std::size_t size, void* place)
-		// {
-			// return ::operator new(size, place);
-		// }
-
-		// inline static void operator delete(void* p, void* place)
-		// {
-			// return ::operator new(p, place);
-		// }
-		/*
-			operator new[]   在windows下无法使用，存在内存泄漏，仅在linux下使用
-		*/
+		
 #if !defined(_WIN32) && !defined(_WIN64)
 		//正常版 new[]/delete[]
 		inline static void* operator new[](std::size_t size) throw(std::bad_alloc)
@@ -249,18 +272,93 @@ BEGIN_NAMESPACE
 			operator delete(p, std::nothrow);
 		}
 
-		// //placement new/delete
-		// inline static void* operator new[](std::size_t size, void* place)
-		// {
-			// return operator new(size,place);
-		// }
-
-		// inline static void operator delete[](void* p, void* place)
-		// {
-			// ::operator delete(p, place);
-		// }
 #endif
 	
+	};
+
+
+	
+	template<class T, std::size_t blockSize = sizeof(T) > 
+	class CreateFixedObjectNew
+	{
+	public:
+		static T* Create()				{ return new T(blockSize, blockSize * 256);}
+		static void Destroy(T* p)		{ delete p;}
+	};
+
+
+		/*
+		function: 任意对象池
+		例:
+			class A : public FixedObject<A>
+			{};
+
+			//错误情况,注意，使用这种对象池后， 类A就不允许被继承, 如下:
+			class B : public A		// error
+			{};
+
+			//申请
+			A* pA = new A;
+
+			//释放
+			delete pA;
+	*/
+	template
+	<
+		class T,																	//需要使用对象池的类型
+		template<class,class>class ThreadingModel = ::Loki::ClassLevelLockable		//默认使用多线程
+	>
+	class FixedObject
+	{
+	public:
+		typedef Singleton<FixedAllocator, 0, CreateFixedObjectNew<FixedAllocator>, ThreadingModel> AllocSingeleton;
+
+		virtual ~FixedObject(){}
+	protected:
+		FixedObject(){}
+		FixedObject(const FixedObject&){}
+		FixedObject& operator=(const FixedObject&) { return *this;}
+
+	public:
+		//正常版 new/delete
+		static void* operator new(std::size_t size) throw(std::bad_alloc)
+		{
+			//这里应该不允许继承的情况
+			assert(sizeof(T) == size);
+
+			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+			return AllocSingeleton::Instance().Allocate();
+
+		}
+
+		static void operator delete(void* p, std::size_t size) throw()
+		{
+			//这里应该不允许继承的情况
+			assert(sizeof(T) == size);
+
+			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+			AllocSingeleton::Instance().Deallocate(p);
+		}
+
+		//不抛异常版 new/delete 
+		static void* operator new(std::size_t size, const std::nothrow_t&) throw()
+		{
+			//这里应该不允许继承的情况
+			assert(sizeof(T) == size);
+
+			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+			return AllocSingeleton::Instance().Allocate();
+		}
+
+		static void operator delete(void* p, const std::nothrow_t&) throw()
+		{
+			//这里应该不允许继承的情况
+			assert(sizeof(T) == size);
+
+			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+			AllocSingeleton::Instance().Deallocate(p);
+		}
+
 	};
 
 END_NAMESPACE

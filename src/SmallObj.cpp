@@ -70,7 +70,7 @@ Chunk::~Chunk()
 }
 
 
-FixedAllocator::FixedAllocator( void )
+FixedAllocator::FixedAllocator(const BlockSize& blockSize/* = BlockSize(0)*/, const PageSize& pageSize/* = PageSize(0)*/)
 	:blockSize_(0)
 	,numBlocks_(0)
 	,chunks_(0)
@@ -78,7 +78,8 @@ FixedAllocator::FixedAllocator( void )
 	,deallocChunk_(NULL)
 	,emptyChunk_(NULL)
 {
-
+	if (blockSize.Get() != 0 && pageSize.Get() != 0)
+		Initialize(blockSize, pageSize);
 }
 
 FixedAllocator::~FixedAllocator()

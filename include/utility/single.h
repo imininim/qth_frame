@@ -87,7 +87,7 @@ BEGIN_NAMESPACE
 	template<
 						class T,			
 						size_t longevity = 0,													//生存周期，数字越大的类越迟被释放掉			
-						template<class>class CreationPolicy = CreateUsingNew,					//创建、释放策略
+						class CreationPolicy = CreateUsingNew<T>,								//创建、释放策略
 						template<class,class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEVEL	//线程模型，默认单线程
 	> 
 	class Singleton
@@ -105,7 +105,7 @@ BEGIN_NAMESPACE
 						throw SingletonException();
 					}
 
-					pInstance_ = CreationPolicy<T>::Create();
+					pInstance_ = CreationPolicy::Create();
 					if (longevity <= 999)
 						SetLongevity(pInstance_, longevity, DestroySingleton);
 					else
@@ -125,7 +125,7 @@ BEGIN_NAMESPACE
 
 		static void DestroySingleton(T*)
 		{
-			CreationPolicy<T>::Destroy(pInstance_);
+			CreationPolicy::Destroy(pInstance_);
 			pInstance_ = NULL;
 		}
 		
@@ -137,10 +137,10 @@ BEGIN_NAMESPACE
 		static bool live_;
 	};
 
-	template<class T, size_t longevity, template<class> class CreationPolicy, template<class,class> class ThreadingModel>
+	template<class T, size_t longevity, class CreationPolicy, template<class,class> class ThreadingModel>
 	typename Singleton<T, longevity,CreationPolicy, ThreadingModel>::InstanceType Singleton<T, longevity,CreationPolicy, ThreadingModel>::pInstance_ = NULL;
 
-	template<class T, size_t longevity, template<class> class CreationPolicy, template<class,class> class ThreadingModel>
+	template<class T, size_t longevity, class CreationPolicy, template<class,class> class ThreadingModel>
 	bool Singleton<T, longevity,CreationPolicy, ThreadingModel>::live_ = false;
 END_NAMESPACE
 #endif

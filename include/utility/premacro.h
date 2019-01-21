@@ -55,5 +55,91 @@ example:
 *****************************/
 #define INVOKE_ARG_MACRO(M,...) PRIVATE_ARGS_GLUE(MACCONNECT(M,GET_ARGS_COUNT(__VA_ARGS__)), (__VA_ARGS__))
 
+
+/********************
+function: 宏 int 转换bool
+*********************/
+#define I_TO_BOOL(i) I_TO_BOOL_##i
+#define I_TO_BOOL_0		0
+#define I_TO_BOOL_1		1
+#define I_TO_BOOL_2		1
+#define I_TO_BOOL_3		1
+#define I_TO_BOOL_4		1
+#define I_TO_BOOL_5		1
+#define I_TO_BOOL_6		1
+#define I_TO_BOOL_7		1
+#define I_TO_BOOL_8		1
+#define I_TO_BOOL_9		1
+#define I_TO_BOOL_10	1
+
+#define I_TO_BOOL_11	1
+#define I_TO_BOOL_12	1
+#define I_TO_BOOL_13	1
+#define I_TO_BOOL_14	1
+#define I_TO_BOOL_15	1
+#define I_TO_BOOL_16	1
+#define I_TO_BOOL_17	1
+#define I_TO_BOOL_18	1
+#define I_TO_BOOL_19	1
+#define I_TO_BOOL_20	1
+
+#define I_TO_BOOL_21	1
+#define I_TO_BOOL_22	1
+#define I_TO_BOOL_23	1
+#define I_TO_BOOL_24	1
+#define I_TO_BOOL_25	1
+#define I_TO_BOOL_26	1
+#define I_TO_BOOL_27	1
+#define I_TO_BOOL_28	1
+#define I_TO_BOOL_29	1
+#define I_TO_BOOL_30	1
+
+#define I_TO_BOOL_31	1
+#define I_TO_BOOL_32	1
+#define I_TO_BOOL_33	1
+#define I_TO_BOOL_34	1
+#define I_TO_BOOL_35	1
+#define I_TO_BOOL_36	1
+#define I_TO_BOOL_37	1
+#define I_TO_BOOL_38	1
+#define I_TO_BOOL_39	1
+#define I_TO_BOOL_40	1
+
+#define I_TO_BOOL_41	1
+#define I_TO_BOOL_42	1
+#define I_TO_BOOL_43	1
+#define I_TO_BOOL_44	1
+#define I_TO_BOOL_45	1
+#define I_TO_BOOL_46	1
+#define I_TO_BOOL_47	1
+#define I_TO_BOOL_48	1
+#define I_TO_BOOL_49	1
+#define I_TO_BOOL_50	1
+
+#define I_TO_BOOL_51	1
+#define I_TO_BOOL_52	1
+#define I_TO_BOOL_53	1
+#define I_TO_BOOL_54	1
+#define I_TO_BOOL_55	1
+#define I_TO_BOOL_56	1
+#define I_TO_BOOL_57	1
+#define I_TO_BOOL_58	1
+#define I_TO_BOOL_59	1
+#define I_TO_BOOL_60	1
+
+#define I_TO_BOOL_61	1
+#define I_TO_BOOL_62	1
+#define I_TO_BOOL_63	1
+#define I_TO_BOOL_64	1
+
+/*************************
+function: if_else 宏
+tips:
+	依据条件来选择是使用 true_con宏 还是false_con宏
+*************************/
+#define IF_MACRO(condition, true_con, false_con)	IF_ ## I_TO_BOOL(condition) (true_con, false_con)
+#define IF_0(true_con, false_con)	false_con
+#define IF_1(true_con, false_con)	true_con
+
 #endif
 
