@@ -85,6 +85,8 @@ int main(int argc, char* argv[])
 
 		cout << "创建一个class C，然后释放..." << endl;
 		C* pC = new C;
+		pC->c = 1;
+		pC->p = 2;
 		delete pC;
 
 		/////////////////////////////////////重载 new[]/delete[]    仅在 linux 下享受内存池效果， windows 下并未重载operator new[]/delete[]
@@ -102,6 +104,7 @@ int main(int argc, char* argv[])
 	{
 		cout << "创建一个class D，然后释放..." << endl;
 		D* pD = new D;
+		pD->d = 1;
 		delete pD;
 	}
 
