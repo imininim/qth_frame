@@ -278,82 +278,82 @@ BEGIN_NAMESPACE
 
 
 	
-	template<class T, std::size_t blockSize> 
-	class CreateFixedObjectNew
-	{
-	public:
-		static T* Create()				{ return new T(blockSize, blockSize * 256);}
-		static void Destroy(T* p)		{ delete p;}
-	};
+	//template<class T, std::size_t blockSize> 
+	//class CreateFixedObjectNew
+	//{
+	//public:
+	//	static T* Create()				{ return new T(blockSize, blockSize * 256);}
+	//	static void Destroy(T* p)		{ delete p;}
+	//};
 
 
-		/*
-		function: 任意对象池
-		例:
-			class A : public FixedObject<A>
-			{};
+	//	/*
+	//	function: 任意对象池
+	//	例:
+	//		class A : public FixedObject<sizeof(A)>
+	//		{};
 
-			//错误情况,注意，使用这种对象池后， 类A就不允许被继承, 如下:
-			class B : public A		// error
-			{};
+	//		//错误情况,注意，使用这种对象池后， 类A就不允许被继承, 如下:
+	//		class B : public A		// error
+	//		{};
 
-			//申请
-			A* pA = new A;
+	//		//申请
+	//		A* pA = new A;
 
-			//释放
-			delete pA;
-	*/
-	template
-	<
-		class T,																	//需要使用对象池的类型
-		template<class,class>class ThreadingModel = ::Loki::ClassLevelLockable		//默认使用多线程
-	>
-	class FixedObject
-	{
-	public:
-		typedef Singleton<FixedAllocator, 0, CreateFixedObjectNew<FixedAllocator, sizeof(T)>, ThreadingModel> AllocSingeleton;
+	//		//释放
+	//		delete pA;
+	//*/
+	//template
+	//<
+	//	std::size_t TSize,															//需要分配对象的大小
+	//	template<class,class>class ThreadingModel = ::Loki::ClassLevelLockable		//默认使用多线程
+	//>
+	//class FixedObject
+	//{
+	//public:
+	//	typedef Singleton<FixedAllocator, 0, CreateFixedObjectNew<FixedAllocator, TSize>, ThreadingModel> AllocSingeleton;
 
-		virtual ~FixedObject(){}
-	protected:
-		FixedObject(){}
-		FixedObject(const FixedObject&){}
-		FixedObject& operator=(const FixedObject&) { return *this;}
+	//	virtual ~FixedObject(){}
+	//protected:
+	//	FixedObject(){}
+	//	FixedObject(const FixedObject&){}
+	//	FixedObject& operator=(const FixedObject&) { return *this;}
 
-	public:
-		//正常版 new/delete
-		static void* operator new(std::size_t size) throw(std::bad_alloc)
-		{
-			//这里应该不允许继承的情况
-			assert(sizeof(T) == size);
+	//public:
+	//	//正常版 new/delete
+	//	static void* operator new(std::size_t size) throw(std::bad_alloc)
+	//	{
+	//		//这里应该不允许继承的情况
+	//		assert(TSize == size);
 
-			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
-			return AllocSingeleton::Instance().Allocate();
+	//		typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+	//		return AllocSingeleton::Instance().Allocate();
 
-		}
+	//	}
 
-		static void operator delete(void* p, std::size_t size) throw()
-		{
-			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
-			AllocSingeleton::Instance().Deallocate(p);
-		}
+	//	static void operator delete(void* p, std::size_t size) throw()
+	//	{
+	//		typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+	//		AllocSingeleton::Instance().Deallocate(p);
+	//	}
 
-		//不抛异常版 new/delete 
-		static void* operator new(std::size_t size, const std::nothrow_t&) throw()
-		{
-			//这里应该不允许继承的情况
-			assert(sizeof(T) == size);
+	//	//不抛异常版 new/delete 
+	//	static void* operator new(std::size_t size, const std::nothrow_t&) throw()
+	//	{
+	//		//这里应该不允许继承的情况
+	//		assert(TSize == size);
 
-			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
-			return AllocSingeleton::Instance().Allocate();
-		}
+	//		typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+	//		return AllocSingeleton::Instance().Allocate();
+	//	}
 
-		static void operator delete(void* p, const std::nothrow_t&) throw()
-		{
-			typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
-			AllocSingeleton::Instance().Deallocate(p);
-		}
+	//	static void operator delete(void* p, const std::nothrow_t&) throw()
+	//	{
+	//		typename ThreadingModel<AllocSingeleton, LOKI_DEFAULT_MUTEX>::Lock guard;
+	//		AllocSingeleton::Instance().Deallocate(p);
+	//	}
 
-	};
+	//};
 
 END_NAMESPACE
 #endif

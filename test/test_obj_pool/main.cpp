@@ -35,15 +35,6 @@ struct C: public B
 	int c;
 };
 
-//任意大小的类对象使用内存池测试(注意: 类D 无法被继承)
-struct D: public QTH_NAME_SPACE::FixedObject<D>
-{
-	D(){ cout << "D::D" << endl;}
-	~D(){ cout << "D::~D" << endl;}
-
-	int d;
-};
-
 
 #include <vector>
 int main(int argc, char* argv[])
@@ -99,14 +90,14 @@ int main(int argc, char* argv[])
 
 		delete[] vecB;
 	}
-	///////////////////////////////////////////////////////////////////////////使用4
-	//任意对象的内存池应用
-	{
-		cout << "创建一个class D，然后释放..." << endl;
-		D* pD = new D;
-		pD->d = 1;
-		delete pD;
-	}
+	/////////////////////////////////////////////////////////////////////////使用4
+	////任意对象的内存池应用
+	//{
+	//	cout << "创建一个class D，然后释放..." << endl;
+	//	D* pD = new D;
+	//	pD->d = 1;
+	//	delete pD;
+	//}
 
 
 	getchar();
