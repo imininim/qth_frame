@@ -1,6 +1,4 @@
 ﻿#include "collect.h"
-#include "utility/utility.h"
-#include "utility/logger.h"
 
 void CCollect::doCollect(time_t start)
 {
@@ -29,7 +27,7 @@ void CCollect::dump()
 	//当前这段时间的处理
 	time_t subDealTime = end.time_deal - start.time_deal;
 	size_t num = m_data.size();
-	size_t avg = num/subDealTime;
+	size_t avg = num/(size_t)subDealTime;
 
 	LOG_INFO("服务器信息: 收到的包总量:%u 时间间隔:%lu 平均收到的数量%u包/秒", num, subDealTime, avg);
 

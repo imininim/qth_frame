@@ -3,6 +3,8 @@
 #define _COLLECT_H_
 #include <vector>
 #include <time.h>
+#include "utility/utility.h"
+#include "utility/logger.h"
 
 struct STimeData
 {
