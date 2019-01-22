@@ -35,7 +35,7 @@ bool CmdParse::parse(const std::string& str_in)
 	std::vector<std::string> keyValuePairs;
 	str_split(keyValuePairs, str_in, ' '); //以空格分割的key=value字符串对
 
-	size_t n = (keyValuePairs.size() % 2 == 0) ? keyValuePairs.size() : keyValuePairs.size() - 1; //取偶数对
+	size_t n = keyValuePairs.size();
 	if (!n) return false;
 
 	m_kvMap->clear();

@@ -12,7 +12,7 @@
 #include "utility/logger.h"
 
 #include "collect.h"
-
+#include "common/property.h"
 using namespace QTH_NAME_SPACE;
 
 class CMyFrameWork: public CFrameWork
@@ -58,9 +58,21 @@ public:
 
 	virtual void OnCommond(const char* pData, size_t len)
 	{
-		//显示终端命令
-		using namespace std;
-		cout << pData << endl;
+		if (!pData || len == 0) return;
+
+		//解析参数
+		CmdParse cmd;
+		cmd.parse(std::string(pData));
+		
+		//用户输入了答应信息的命令行
+		if (cmd["act"] == "dump")
+		{
+			m_collect.dump();
+		}
+		else
+		{
+			LOG_DEBUG("命令行 %s 未找到对应的处理!", pData);
+		}
 	}
 
 	virtual void OnError(ConnectPtr pTCPHandle, int errCode, const std::string& msg)
@@ -90,7 +102,7 @@ int main(int argc, char* argv[])
 
 	{
 		CMyFrameWork frame("test", atoi(buf));
-		frame.main();
+		frame.main(true);
 	}
 	
 	getchar();
