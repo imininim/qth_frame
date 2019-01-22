@@ -1,5 +1,5 @@
 ﻿/*
-	上传下载测试客户端
+	tcp客户端发包工具
 */
 #include <iostream>
 //step1 动态库公用头文件

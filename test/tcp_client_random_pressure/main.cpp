@@ -1,5 +1,5 @@
 ﻿/*
-	压力测试 回显客户端 tcp_client 
+	tcp压力测试 
 */
 #include <iostream>
 #include <string.h>
@@ -9,6 +9,7 @@
 	#include <unistd.h>
 #endif
 
+#include <time.h>
 //step1 动态库公用头文件
 #include "utility/utility.h"
 using std::cout;
@@ -32,6 +33,8 @@ void threadWrite(ClientConnectPtr pConnect, char* buff, int len)
 {
 	if (pConnect && buff)
 	{
+		time_t* pTime = (time_t*)buff;
+		*pTime = time(NULL); //将当前时间发送过去
 		pConnect->Send(buff, len);
 	}
 }
@@ -61,8 +64,10 @@ int main(int argc, char* argv[])
 
 	std::vector<IProcessor*> processor;
 	
-	//分配2个线程进行分别的读写操作
+	//分配线程进行分别的读写操作
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write1"));
+	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write2"));
+
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Read1"));
 
 	//分配一个连接   interface_tcp_client_conn.h 接口说明文件
@@ -74,13 +79,20 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	if (!pConnect->Connect("127.0.0.1", 11234))
+	char pszIP[256] = {};
+	short port = 0;
+	cout << "请输入连接的IP地址: ";
+	cin.getline(pszIP, 256);
+	cout << "请输入端口: ";
+	cin >> port;
+	cout << "开始连接服务器 " << pszIP << ":" << T_to_string(port).c_str() << endl;
+	if (!pConnect->Connect(pszIP, port))
 	{
 		cout << "连接错误: " << pConnect->GetErrorCode() << " , " << pConnect->GetErrorInfo().c_str() << endl;
 		getchar();
 		return 0;
 	}
-	
+			
 	char *pReadBuf = new char[BUFF_SIZE];		//接收缓冲区
 	char *pWriteBuf = new char[BUFF_SIZE];		//发送缓冲区
 	int index = 0;								//发送线程索引
@@ -104,9 +116,13 @@ int main(int argc, char* argv[])
 		processor[sendIndex]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect, pWriteBuf, BUFF_SIZE));
 
 		//选择读取线程接收数据并输出信息
-		processor[processor.size() -1]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect, pReadBuf, BUFF_SIZE));
+		//processor[processor.size() -1]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect, pReadBuf, BUFF_SIZE));
 	}
 	
+	//停止所有线程处理
+	for (size_t i = 0; i < processor.size(); ++i)
+		CProcessorMgr::Instance().FreeProcessor(processor[i]);
+
 	delete[] pReadBuf;
 	delete[] pWriteBuf;
 	return 0;

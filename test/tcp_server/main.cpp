@@ -1,21 +1,24 @@
 ﻿/*
-	tcp 回显服务器 测试 
+	tcp服务器测试， 此测试程序用于测试服务器的一些部分性能参数,包括如下
+	1. 平均吞吐量、巅峰吞吐量
+	2. 服务器平均响应时间（毫秒）,	巅峰响应时间
 */
 #include <iostream>
 
 //step1 动态库公用头文件
 #include "utility/utility.h"
-
 //step2 服务头文件
 #include "asio/frame_work.h"
-
-
 #include "utility/logger.h"
+
+#include "collect.h"
 
 using namespace QTH_NAME_SPACE;
 
 class CMyFrameWork: public CFrameWork
 {
+private:
+	CCollect m_collect;
 public:
 	/*
 		构造参数：
@@ -23,7 +26,7 @@ public:
 		2. 服务器使用端口
 		3. 处理 监听、建立连接、消息收发的线程数量
 	*/
-	CMyFrameWork(const std::string& strName, unsigned short nPort, int threadNum = 2): CFrameWork(strName,nPort, threadNum)
+	CMyFrameWork(const std::string& strName, unsigned short nPort, int threadNum = 3): CFrameWork(strName,nPort, threadNum)
 	{
 
 	}
@@ -35,42 +38,7 @@ public:
 
 	virtual void OnInitialize(void)
 	{
-		char buf[256] = {0};
-		std::cout << "是否需要连接其他服务器?(n/y): ";
-		std::cin.getline(buf, 256);
-
-		if (strcmp("y", buf) == 0)
-		{
-		std::string strIp;
-		unsigned short nPort = 0;
-
-		memset(buf, 0, 256);
-		std::cout << "请输入需要连接服务器的IP: ";
-		std::cin.getline(buf, 256);
-		strIp = buf;
-
-		memset(buf, 0, 256);
-		std::cout << "请输入需要连接服务器的端口: ";
-		std::cin.getline(buf, 256);
-		nPort = atoi(buf);
-
-		pServer = m_pSvrHandle->ConnectServer(strIp, nPort);
-		if (pServer && pServer->isOpen())
-		{
-		pServer->SendMsg("hello, this server!", strlen("hello, this server!")+1);
-		std::cout << "连接服务器:" << strIp.c_str() << " 端口:" << nPort << "成功!" << std::endl;
-		}		
-		else if (pServer == NULL)
-		std::cout << "服务器连接错误， 内存分配失败!" << std::endl;
-		else
-		std::cout << "连接错误 " << pServer->GetErrorCode() << " 原因:" << pServer->GetErrorInfo().c_str() << std::endl;
-
-		}
-
-		for (int i = 1; i <= 10; ++i)
-		{
-			m_pSvrHandle->SetTimer(i, i * 100); //设定10个定时器，每个定时器间隔为其序号*100毫秒
-		}
+		
 	}
 	virtual void OnUninitalize(void)
 	{
@@ -80,13 +48,12 @@ public:
 	}
 	virtual void OnRecvMsg(ConnectPtr pTCPHandle, const char* pData, size_t len)
 	{
-		static int i = 0;
-
-		if (pTCPHandle && (++i % 3 == 0)) //每接收3次消息，回复一次
-			pTCPHandle->SendMsg(pData, len); 
-
-		if (i % 10 == 0)				//每接收10次消息，关闭一个连接
-			pTCPHandle->Close();
+		//在这里测试服务器的吞吐量,确定服务器在本地测试环境下，每秒钟的收包数量  
+		if (len >= sizeof(long))
+		{
+			const long* pTime = (const long*)pData;
+			m_collect.doCollect(*pTime);
+		}
 	}
 
 	virtual void OnCommond(const char* pData, size_t len)
@@ -104,18 +71,10 @@ public:
 	
 	virtual void OnTimer(std::size_t nIDEvent, void* params)
 	{
-		using namespace std;
-		cout << "定时器" << nIDEvent << endl;
-
-		//定时器执行次数+1
-		++m_timerNum[nIDEvent];
-		if (m_timerNum[nIDEvent] >= 10) 
-			m_pSvrHandle->KillTimer(nIDEvent);
+		
 
 	}
-	std::list<ConnectPtr> m_list;
-	ConnectPtr pServer;
-	std::map<int,int> m_timerNum;
+	
 };
 
 int main(int argc, char* argv[])
