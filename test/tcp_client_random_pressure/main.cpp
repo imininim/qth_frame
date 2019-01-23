@@ -59,7 +59,7 @@ void threadRead(ClientConnectPtr pConnect, char* buff, int len)
 	else
 	{
 		//输出服务器回复的消息
-		cout  << buff << endl;
+		//cout  << buff << endl;
 	}
 
 	g_lock.Lock();
