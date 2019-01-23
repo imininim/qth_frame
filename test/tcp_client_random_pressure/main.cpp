@@ -26,7 +26,10 @@ using std::cin;
 using namespace QTH_NAME_SPACE;
 
 //每次发送，接收字节数量
-#define BUFF_SIZE 48
+#define BUFF_SIZE 32
+Loki::Mutex g_lock;
+FixedAllocator g_allocator(BlockSize(BUFF_SIZE), PageSize(BUFF_SIZE * 4096) );
+
 
 //发送线程
 void threadWrite(ClientConnectPtr pConnect, char* buff, int len)
@@ -36,6 +39,11 @@ void threadWrite(ClientConnectPtr pConnect, char* buff, int len)
 		time_t* pTime = (time_t*)buff;
 		*pTime = time(NULL); //将当前时间发送过去
 		pConnect->Send(buff, len);
+
+		
+		g_lock.Lock();
+		g_allocator.Deallocate(buff);
+		g_lock.Unlock();
 	}
 }
 
@@ -66,8 +74,6 @@ int main(int argc, char* argv[])
 	
 	//分配线程进行分别的读写操作
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write1"));
-	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write2"));
-
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Read1"));
 
 	//分配一个连接   interface_tcp_client_conn.h 接口说明文件
@@ -79,42 +85,43 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	char pszIP[256] = {};
-	short port = 0;
-	cout << "请输入连接的IP地址: ";
-	cin.getline(pszIP, 256);
-	cout << "请输入端口: ";
-	cin >> port;
-	cout << "开始连接服务器 " << pszIP << ":" << T_to_string(port).c_str() << endl;
-	if (!pConnect->Connect(pszIP, port))
+	std::string strIP = "127.0.0.1";
+	short port = 7000;
+
+	if (argc >= 3) //包括连接IP和端口
+	{
+		strIP = argv[1];
+		port = atoi(argv[2]);
+	}
+
+	cout << "正在向IP:" << strIP.c_str() << " 端口:" << port << "请求连接!" << endl;
+	if (!pConnect->Connect(strIP.c_str(), port))
 	{
 		cout << "连接错误: " << pConnect->GetErrorCode() << " , " << pConnect->GetErrorInfo().c_str() << endl;
 		getchar();
 		return 0;
 	}
 			
-	char *pReadBuf = new char[BUFF_SIZE];		//接收缓冲区
-	char *pWriteBuf = new char[BUFF_SIZE];		//发送缓冲区
+		
 	int index = 0;								//发送线程索引
 	
 	while (true)		
 	{
-#ifdef WIN32
-		Sleep(5);
-#else
-		usleep(5000);
-#endif
+		Sleep(1); //每毫秒发送一次, 每秒钟发送1000次， 具体发送的数据包数依据发送线程的数量而定
 
-		memset(pWriteBuf, 0, BUFF_SIZE);
+				
+		 //发送数据
+		for (size_t i  =0; i < processor.size(); ++i)
+		{
+			g_lock.Lock();
+			char *pWriteBuf = (char *)g_allocator.Allocate();		//发送的数据基本上随便，只需要发送长度
+			g_lock.Unlock();
 
-		for (int i = 0; i < BUFF_SIZE - 1; ++i)			//随机生成需要发送的字节的数据
-			pWriteBuf[i] = strN[rand()%strN.size()];
+			memset(pWriteBuf, 0, BUFF_SIZE);
 
-		pWriteBuf[BUFF_SIZE - 1] = '\0';
-		//随机选择一个发送线程，将数据发送出去
-		int sendIndex = processor.size()-2 > 0 ? (++index) % (processor.size()-2) : 0;
-		processor[sendIndex]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect, pWriteBuf, BUFF_SIZE));
-
+			processor[i]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect, pWriteBuf, BUFF_SIZE));
+		}
+			
 		//选择读取线程接收数据并输出信息
 		//processor[processor.size() -1]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect, pReadBuf, BUFF_SIZE));
 	}
@@ -122,8 +129,6 @@ int main(int argc, char* argv[])
 	//停止所有线程处理
 	for (size_t i = 0; i < processor.size(); ++i)
 		CProcessorMgr::Instance().FreeProcessor(processor[i]);
-
-	delete[] pReadBuf;
-	delete[] pWriteBuf;
+			
 	return 0;
 }

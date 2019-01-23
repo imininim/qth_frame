@@ -37,13 +37,20 @@ public:
 
 	virtual void OnInitialize(void)
 	{
+		using namespace std;
+		cout << "服务器初始化成功! 正在等待用户连接..." << endl;
 		
 	}
 	virtual void OnUninitalize(void)
 	{
+		using namespace std;
+		cout << "服务器关闭." << endl;
 	}
 	virtual void OnLogin(ConnectPtr pTCPHandle)
 	{
+		using namespace std;
+		std::cout << "有用户登录!" << endl;
+		cout << ">";
 	}
 	virtual void OnRecvMsg(ConnectPtr pTCPHandle, const char* pData, size_t len)
 	{
@@ -66,17 +73,23 @@ public:
 		//用户输入了答应信息的命令行
 		if (cmd["act"] == "dump")
 		{
-			m_collect.dump();
+			m_collect.dump();  //打印
+		}
+		else if (cmd["act"] == "clear")
+		{
+			m_collect.reset(); //清理数据
 		}
 		else
 		{
-			LOG_DEBUG("命令行 %s 未找到对应的处理!", pData);
+			std::cout << "命令行" << pData << "未找到对应的处理!" << std::endl;
 		}
 	}
 
 	virtual void OnError(ConnectPtr pTCPHandle, int errCode, const std::string& msg)
 	{
-		
+		using namespace std;
+		cout << "连接发生错误, 错误码:" << errCode << " 原因:" << msg.c_str() << endl;
+		cout << ">";
 
 	}
 	
