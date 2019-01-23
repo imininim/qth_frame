@@ -107,8 +107,11 @@ int main(int argc, char* argv[])
 	
 	while (true)		
 	{
+#ifdef WIN32
 		Sleep(1); //每毫秒发送一次, 每秒钟发送1000次， 具体发送的数据包数依据发送线程的数量而定
-
+#else
+		usleep(1000);
+#endif
 				
 		 //发送数据
 		for (size_t i  =0; i < processor.size(); ++i)
