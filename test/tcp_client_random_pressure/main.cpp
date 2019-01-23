@@ -74,7 +74,13 @@ int main(int argc, char* argv[])
 	
 	//分配线程进行分别的读写操作
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write1"));
+	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write2"));
+
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Read1"));
+
+#if !defined(WIN32) && !defined(WIN64)
+	daemon(1,1);  //linux 作为后台程序运行
+#endif
 
 	//分配一个连接   interface_tcp_client_conn.h 接口说明文件
 	ClientConnectPtr pConnect  = CTcpConnectMgr::Instance().AllocConnect();
