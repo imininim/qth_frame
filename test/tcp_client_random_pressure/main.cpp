@@ -61,6 +61,10 @@ void threadRead(ClientConnectPtr pConnect, char* buff, int len)
 		//输出服务器回复的消息
 		cout  << buff << endl;
 	}
+
+	g_lock.Lock();
+	g_allocator.Deallocate(buff);
+	g_lock.Unlock();
 	
 }
 
@@ -74,8 +78,6 @@ int main(int argc, char* argv[])
 	
 	//分配线程进行分别的读写操作
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write1"));
-	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write2"));
-
 	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Read1"));
 
 #if !defined(WIN32) && !defined(WIN64)
@@ -119,20 +121,19 @@ int main(int argc, char* argv[])
 		usleep(1000);
 #endif
 				
-		 //发送数据
-		for (size_t i  =0; i < processor.size(); ++i)
-		{
+		 
 			g_lock.Lock();
 			char *pWriteBuf = (char *)g_allocator.Allocate();		//发送的数据基本上随便，只需要发送长度
+			char *pReadBuf = (char *)g_allocator.Allocate();		
 			g_lock.Unlock();
 
 			memset(pWriteBuf, 0, BUFF_SIZE);
+			memset(pReadBuf, 0, BUFF_SIZE);
 
-			processor[i]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect, pWriteBuf, BUFF_SIZE));
-		}
-			
-		//选择读取线程接收数据并输出信息
-		//processor[processor.size() -1]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect, pReadBuf, BUFF_SIZE));
+			//发包
+			processor[0]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect, pWriteBuf, BUFF_SIZE));
+			//收包
+			processor[1]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect, pReadBuf, BUFF_SIZE));		
 	}
 	
 	//停止所有线程处理

@@ -53,13 +53,15 @@ public:
 	}
 	virtual void OnRecvMsg(ConnectPtr pTCPHandle, const char* pData, size_t len)
 	{
-		/*if (len >= sizeof(long))
+		if (len >= sizeof(long))
 		{
 			const long* pTime = (const long*)pData;
 			m_collect.doCollect(*pTime);
-		}*/
-		//消息回显
-		pTCPHandle->SendMsg(pData, len);
+
+			//消息回显
+			pTCPHandle->SendMsg(pData, len);
+		}
+		
 	}
 
 	virtual void OnCommond(const char* pData, size_t len)
