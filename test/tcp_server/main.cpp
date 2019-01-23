@@ -1,7 +1,6 @@
 ﻿/*
-	tcp服务器测试， 此测试程序用于测试服务器的一些部分性能参数,包括如下
-	1. 平均吞吐量、巅峰吞吐量
-	2. 服务器平均响应时间（毫秒）,	巅峰响应时间
+	tcp服务器, 消息回显服务器
+	
 */
 #include <iostream>
 
@@ -54,12 +53,13 @@ public:
 	}
 	virtual void OnRecvMsg(ConnectPtr pTCPHandle, const char* pData, size_t len)
 	{
-		//在这里测试服务器的吞吐量,确定服务器在本地测试环境下，每秒钟的收包数量  
-		if (len >= sizeof(long))
+		/*if (len >= sizeof(long))
 		{
 			const long* pTime = (const long*)pData;
 			m_collect.doCollect(*pTime);
-		}
+		}*/
+		//消息回显
+		pTCPHandle->SendMsg(pData, len);
 	}
 
 	virtual void OnCommond(const char* pData, size_t len)
