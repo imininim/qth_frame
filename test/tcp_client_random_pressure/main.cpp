@@ -26,31 +26,27 @@ using std::cin;
 using namespace QTH_NAME_SPACE;
 
 //每次发送，接收字节数量
-#define BUFF_SIZE 32
+#define BUFF_SIZE 16
 Loki::Mutex g_lock;
 FixedAllocator g_allocator(BlockSize(BUFF_SIZE), PageSize(BUFF_SIZE * 4096) );
 
 
 //发送线程
-void threadWrite(ClientConnectPtr pConnect, char* buff, int len)
+void threadWrite(ClientConnectPtr pConnect)
 {
-	if (pConnect && buff)
+	if (pConnect)
 	{
+		char buff[BUFF_SIZE] = {};
 		time_t* pTime = (time_t*)buff;
 		*pTime = time(NULL); //将当前时间发送过去
-		pConnect->Send(buff, len);
-
-		
-		g_lock.Lock();
-		g_allocator.Deallocate(buff);
-		g_lock.Unlock();
+		pConnect->Send(buff, BUFF_SIZE);
 	}
 }
 
 //读取线程
-void threadRead(ClientConnectPtr pConnect, char* buff, int len)
+void threadRead(ClientConnectPtr pConnect)
 {
-	memset(buff, 0, BUFF_SIZE);
+	char buff[BUFF_SIZE] = {};
 	long nRead = pConnect->Recv(buff, BUFF_SIZE);
 	if (nRead <= 0)
 	{
@@ -58,14 +54,9 @@ void threadRead(ClientConnectPtr pConnect, char* buff, int len)
 	}
 	else
 	{
-		//输出服务器回复的消息
-		//cout  << buff << endl;
+		//..正常收到数据
+		
 	}
-
-	g_lock.Lock();
-	g_allocator.Deallocate(buff);
-	g_lock.Unlock();
-	
 }
 
 int main(int argc, char* argv[])
@@ -76,10 +67,44 @@ int main(int argc, char* argv[])
 
 	std::vector<IProcessor*> processor;
 	
-	//分配线程进行分别的读写操作
-	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Write1"));
-	processor.push_back(CProcessorMgr::Instance().AllocProcessor("Read1"));
+	std::string strIP = "127.0.0.1";
+	short port = 7001;
+	size_t nThread = 10; //启用线程数量
 
+	
+	if (argc >= 4)		//包括连接IP 端口 启用线程数量
+	{
+		strIP = argv[1];
+		port = atoi(argv[2]);
+		nThread = atol(argv[3]);
+	}
+	else if(argc >= 3) //包括连接IP和端口
+	{
+		strIP = argv[1];
+		port = atoi(argv[2]);
+	}
+	else if (argc >= 2) //端口
+	{
+		port = atoi(argv[1]);
+	}
+			
+	std::string strRead = "Read";
+	std::string strWrite = "Write";
+
+	//分配线程进行分别的读写操作
+	for (size_t i = 0; i < nThread; ++i)
+	{
+		std::string strTemp;
+		if (i % 2 ==0)
+			strTemp = strRead + QTH_NAME_SPACE::T_to_string(i);
+		else
+			strTemp = strWrite + QTH_NAME_SPACE::T_to_string(i);
+		
+		//分配线程
+		processor.push_back(CProcessorMgr::Instance().AllocProcessor(strTemp.c_str()));
+	}
+
+	
 	//分配一个连接   interface_tcp_client_conn.h 接口说明文件
 	ClientConnectPtr pConnect  = CTcpConnectMgr::Instance().AllocConnect();
 	if (!pConnect)
@@ -88,16 +113,7 @@ int main(int argc, char* argv[])
 		getchar();
 		return 0;
 	}
-
-	std::string strIP = "127.0.0.1";
-	short port = 7000;
-
-	if (argc >= 3) //包括连接IP和端口
-	{
-		strIP = argv[1];
-		port = atoi(argv[2]);
-	}
-
+		
 	cout << "正在向IP:" << strIP.c_str() << " 端口:" << port << "请求连接!" << endl;
 	if (!pConnect->Connect(strIP.c_str(), port))
 	{
@@ -116,20 +132,20 @@ int main(int argc, char* argv[])
 #else
 		usleep(1000);
 #endif
-				
-		 
-			g_lock.Lock();
-			char *pWriteBuf = (char *)g_allocator.Allocate();		//发送的数据基本上随便，只需要发送长度
-			char *pReadBuf = (char *)g_allocator.Allocate();		
-			g_lock.Unlock();
-
-			memset(pWriteBuf, 0, BUFF_SIZE);
-			memset(pReadBuf, 0, BUFF_SIZE);
-
-			//发包
-			processor[0]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect, pWriteBuf, BUFF_SIZE));
-			//收包
-			processor[1]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect, pReadBuf, BUFF_SIZE));		
+		
+		for (size_t i =0; i < nThread; ++i)
+		{
+			if (i % 2 == 0)
+			{
+				//读
+				processor[i]->PostTask(QTH_NAME_SPACE::bind(threadRead, pConnect));
+			}
+			else
+			{
+				//写
+				processor[i]->PostTask(QTH_NAME_SPACE::bind(threadWrite, pConnect));
+			}
+		}
 	}
 	
 	//停止所有线程处理
